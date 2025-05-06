@@ -1,0 +1,79 @@
+
+import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
+
+const AboutPage = () => {
+  return (
+    <div className="max-w-3xl mx-auto">
+      <h1 className="text-4xl font-bold mb-6">About MindfulReach</h1>
+      
+      <section className="mb-10">
+        <h2 className="text-2xl font-bold mb-4">Our Mission</h2>
+        <div className="prose max-w-none">
+          <p className="text-lg">
+            MindfulReach is dedicated to creating a truly inclusive digital space where all users, regardless of their abilities, can access, consume, and engage with high-quality content without barriers.
+          </p>
+          <p>
+            We believe that access to information is a fundamental right, and our mission is to demonstrate how technology can bring people together rather than create divisions. By adhering to the highest standards of accessibility and inclusive design, we aim to set an example for the broader web community.
+          </p>
+        </div>
+      </section>
+
+      <section className="mb-10" id="accessibility">
+        <h2 className="text-2xl font-bold mb-4">Accessibility Statement</h2>
+        <div className="prose max-w-none">
+          <p>
+            MindfulReach is committed to ensuring digital accessibility for people of all abilities. We are continually improving the user experience for everyone and applying the relevant accessibility standards.
+          </p>
+          <h3 className="text-xl font-semibold mt-6 mb-3">Conformance Status</h3>
+          <p>
+            The Web Content Accessibility Guidelines (WCAG) define requirements for designers and developers to improve accessibility for people with disabilities. MindfulReach strives to conform to WCAG 2.1 Level AA standards.
+          </p>
+          <h3 className="text-xl font-semibold mt-6 mb-3">Our Accessibility Features</h3>
+          <ul>
+            <li>Semantic HTML structure for better screen reader compatibility</li>
+            <li>Keyboard navigable interface</li>
+            <li>Visible focus indicators for keyboard users</li>
+            <li>Text alternatives for non-text content</li>
+            <li>Sufficient color contrast between text and backgrounds</li>
+            <li>Resizable text without loss of content or functionality</li>
+            <li>Dark mode and high contrast options</li>
+            <li>Readable and navigable content structure</li>
+            <li>Skip links for keyboard navigation</li>
+            <li>ARIA attributes where appropriate</li>
+            <li>Large text mode for improved readability</li>
+          </ul>
+          <h3 className="text-xl font-semibold mt-6 mb-3">Feedback</h3>
+          <p>
+            We welcome your feedback on the accessibility of the MindfulReach website. If you encounter accessibility barriers or have suggestions for improvement, please let us know.
+          </p>
+          <div className="mt-6">
+            <Link to="/contact">
+              <Button>Contact Us About Accessibility</Button>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      <section className="mb-10">
+        <h2 className="text-2xl font-bold mb-4">Our Approach to Content</h2>
+        <div className="prose max-w-none">
+          <p>
+            MindfulReach is built on the principle that content should be:
+          </p>
+          <ul>
+            <li><strong>Perceivable</strong> - Information must be presentable to users in ways they can perceive</li>
+            <li><strong>Operable</strong> - Interface components and navigation must be operable</li>
+            <li><strong>Understandable</strong> - Information and operation of the interface must be understandable</li>
+            <li><strong>Robust</strong> - Content must be robust enough to work with current and future technologies</li>
+          </ul>
+          <p>
+            All our articles are written in clear, concise language with proper heading structure, descriptive links, and comprehensive image descriptions. We strive to make complex topics accessible to readers with various cognitive abilities and levels of expertise.
+          </p>
+        </div>
+      </section>
+    </div>
+  );
+};
+
+export default AboutPage;
