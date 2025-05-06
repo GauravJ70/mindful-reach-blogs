@@ -17,10 +17,21 @@ const HomePage = () => {
           <h1 className="text-4xl md:text-5xl font-bold mb-6">
             Inclusive Content for Everyone
           </h1>
-          <p className="text-xl mb-8 text-muted-foreground">
-            A professional blogging platform focused on accessibility, usability, and inclusive design
-            for readers of all abilities.
-          </p>
+          
+          <div className="relative aspect-[21/9] rounded-xl overflow-hidden mb-8">
+            <img 
+              src="https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?q=80&w=2000" 
+              alt="A diverse group of people collaboratively working with digital content, including a person using a screen reader and another using a specialized keyboard" 
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent flex items-end">
+              <p className="text-xl mb-8 text-white p-6 max-w-2xl mx-auto">
+                A professional blogging platform focused on accessibility, usability, and inclusive design
+                for readers of all abilities.
+              </p>
+            </div>
+          </div>
+          
           <div className="max-w-md mx-auto">
             <form 
               className="relative" 
@@ -77,15 +88,26 @@ const HomePage = () => {
       </section>
 
       <section className="py-12 mt-8 bg-muted rounded-lg">
-        <div className="text-center max-w-2xl mx-auto px-4">
-          <h2 className="text-2xl md:text-3xl font-bold mb-4">Our Commitment to Accessibility</h2>
-          <p className="mb-6">
-            MindfulReach is dedicated to creating content that is accessible to everyone, regardless of ability.
-            We follow WCAG 2.1 guidelines and continuously work to improve our platform's accessibility.
-          </p>
-          <Link to="/about">
-            <Button>Learn More About Our Mission</Button>
-          </Link>
+        <div className="md:flex items-center gap-8 max-w-4xl mx-auto px-4">
+          <div className="md:w-1/3 mb-6 md:mb-0">
+            <div className="rounded-lg overflow-hidden">
+              <img 
+                src="https://images.unsplash.com/photo-1530811761207-8d9d22f0a141?q=80&w=800" 
+                alt="A person using a braille display connected to a laptop" 
+                className="w-full h-auto"
+              />
+            </div>
+          </div>
+          <div className="md:w-2/3 text-left">
+            <h2 className="text-2xl md:text-3xl font-bold mb-4">Our Commitment to Accessibility</h2>
+            <p className="mb-6">
+              MindfulReach is dedicated to creating content that is accessible to everyone, regardless of ability.
+              We follow WCAG 2.1 guidelines and continuously work to improve our platform's accessibility.
+            </p>
+            <Link to="/about">
+              <Button>Learn More About Our Mission</Button>
+            </Link>
+          </div>
         </div>
       </section>
     </div>

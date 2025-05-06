@@ -80,9 +80,21 @@ const BlogPostPage = () => {
         <p>
           Web accessibility means that websites, tools, and technologies are designed and developed so that people with disabilities can use them. More specifically, people can perceive, understand, navigate, and interact with the Web and contribute to the Web.
         </p>
-        <p>
-          Accessibility encompasses all disabilities that affect access to the Web, including visual, auditory, physical, speech, cognitive, and neurological disabilities.
-        </p>
+
+        <div className="my-6 md:flex gap-6 items-center">
+          <div className="md:w-1/2 mb-4 md:mb-0">
+            <img 
+              src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=80&w=800" 
+              alt="A person using a screen reader while browsing the web on a laptop with an enlarged text display" 
+              className="rounded-lg w-full"
+            />
+          </div>
+          <div className="md:w-1/2">
+            <p>
+              Accessibility encompasses all disabilities that affect access to the Web, including visual, auditory, physical, speech, cognitive, and neurological disabilities.
+            </p>
+          </div>
+        </div>
         
         <h2>Why Accessibility Matters</h2>
         <p>
@@ -91,6 +103,17 @@ const BlogPostPage = () => {
         <p>
           Access to information and communications technologies, including the Web, is defined as a basic human right in the United Nations Convention on the Rights of Persons with Disabilities (UN CRPD).
         </p>
+
+        <figure className="my-8">
+          <img 
+            src="https://images.unsplash.com/photo-1573496773905-f5b17e717f05?q=80&w=1200" 
+            alt="A person in a wheelchair using a tablet with specialized mounts and an adaptive stylus" 
+            className="rounded-lg w-full"
+          />
+          <figcaption className="text-sm text-center text-muted-foreground mt-2">
+            Adaptive technology enables independence and digital participation for everyone
+          </figcaption>
+        </figure>
 
         <h2>Key Principles</h2>
         <ul>

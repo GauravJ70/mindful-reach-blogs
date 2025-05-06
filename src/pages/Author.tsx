@@ -15,8 +15,8 @@ const AuthorPage = () => {
         <div className="flex flex-col md:flex-row items-center md:items-start gap-6 mb-8">
           <div className="w-48 h-48 rounded-full overflow-hidden shrink-0">
             <img 
-              src="https://images.unsplash.com/photo-1721322800607-8c38375eef04" 
-              alt="Portrait of Gaurav Jadhav"
+              src="https://images.unsplash.com/photo-1514575110897-1253ff7b2ccb?q=80&w=400" 
+              alt="Portrait of Gaurav Jadhav, a young man with glasses smiling at the camera"
               className="w-full h-full object-cover"
             />
           </div>
@@ -37,14 +37,28 @@ const AuthorPage = () => {
           </div>
         </div>
         
-        <div className="prose max-w-none">
-          <h2 className="text-2xl font-bold mb-4">About Gaurav</h2>
-          <p>
-            Gaurav Jadhav is a Second Year Information Technology student at Vishwakarma Institute of Technology. Passionate about accessible web design and digital inclusion, Gaurav aims to build technology that empowers every user — regardless of ability.
-          </p>
-          <p>
-            With a strong foundation in web development and a growing expertise in accessibility standards, Gaurav is committed to creating digital experiences that are not just functional, but truly inclusive. He believes that technology should be a bridge, not a barrier, and works tirelessly to promote this vision through his writing, coding projects, and community involvement.
-          </p>
+        <div className="md:flex gap-8 items-center mb-12">
+          <div className="md:w-2/5 mb-6 md:mb-0">
+            <div className="rounded-lg overflow-hidden">
+              <img 
+                src="https://images.unsplash.com/photo-1559223607-a43c990c692c?q=80&w=800" 
+                alt="A student working on accessible web design using a laptop with an assistive technology device"
+                className="w-full h-auto"
+              />
+            </div>
+          </div>
+          <div className="md:w-3/5 prose max-w-none">
+            <h2 className="text-2xl font-bold mb-4">About Gaurav</h2>
+            <p>
+              Gaurav Jadhav is a Second Year Information Technology student at Vishwakarma Institute of Technology. Passionate about accessible web design and digital inclusion, Gaurav aims to build technology that empowers every user — regardless of ability.
+            </p>
+            <p>
+              With a strong foundation in web development and a growing expertise in accessibility standards, Gaurav is committed to creating digital experiences that are not just functional, but truly inclusive. He believes that technology should be a bridge, not a barrier, and works tirelessly to promote this vision through his writing, coding projects, and community involvement.
+            </p>
+          </div>
+        </div>
+        
+        <div className="prose max-w-none mb-10">
           <p>
             Gaurav founded MindfulReach with the mission to demonstrate that accessibility and beautiful design can coexist, and to educate fellow developers about the importance of building with all users in mind.
           </p>
