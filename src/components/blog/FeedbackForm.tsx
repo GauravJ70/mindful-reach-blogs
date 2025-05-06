@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
 import { StarIcon } from "lucide-react";
+import { submitFeedback } from "@/services/feedbackService";
+import { Input } from "@/components/ui/input";
 
 interface FeedbackFormProps {
   postId: string;
@@ -12,7 +14,10 @@ interface FeedbackFormProps {
 const FeedbackForm = ({ postId }: FeedbackFormProps) => {
   const [rating, setRating] = useState<number | null>(null);
   const [feedback, setFeedback] = useState("");
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
   const [hoveredStar, setHoveredStar] = useState<number | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
   const handleStarClick = (value: number) => {
@@ -26,7 +31,7 @@ const FeedbackForm = ({ postId }: FeedbackFormProps) => {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     
     // Validation
@@ -39,17 +44,38 @@ const FeedbackForm = ({ postId }: FeedbackFormProps) => {
       return;
     }
 
-    // Process feedback submission
-    console.log("Feedback submitted:", { postId, rating, feedback });
-    
-    toast({
-      title: "Thank you for your feedback!",
-      description: "Your input helps us improve our content.",
-    });
+    try {
+      setIsSubmitting(true);
+      
+      // Submit feedback to Supabase
+      await submitFeedback({
+        post_id: postId,
+        name: name || undefined,
+        email: email || undefined,
+        rating,
+        comment: feedback || undefined
+      });
+      
+      toast({
+        title: "Thank you for your feedback!",
+        description: "Your input helps us improve our content.",
+      });
 
-    // Reset the form
-    setRating(null);
-    setFeedback("");
+      // Reset the form
+      setRating(null);
+      setFeedback("");
+      setName("");
+      setEmail("");
+    } catch (error) {
+      console.error("Error submitting feedback:", error);
+      toast({
+        title: "Submission failed",
+        description: "There was a problem submitting your feedback. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -88,6 +114,33 @@ const FeedbackForm = ({ postId }: FeedbackFormProps) => {
             ))}
           </div>
         </fieldset>
+
+        <div className="mb-4">
+          <label htmlFor="feedback-name" className="block text-sm font-medium mb-2">
+            Your Name (optional)
+          </label>
+          <Input
+            id="feedback-name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Your name"
+            className="w-full"
+          />
+        </div>
+
+        <div className="mb-4">
+          <label htmlFor="feedback-email" className="block text-sm font-medium mb-2">
+            Your Email (optional)
+          </label>
+          <Input
+            id="feedback-email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="your.email@example.com"
+            className="w-full"
+          />
+        </div>
         
         <div className="mb-4">
           <label htmlFor="feedback" className="block text-sm font-medium mb-2">
@@ -103,8 +156,8 @@ const FeedbackForm = ({ postId }: FeedbackFormProps) => {
           />
         </div>
         
-        <Button type="submit" className="w-full">
-          Submit Feedback
+        <Button type="submit" className="w-full" disabled={isSubmitting}>
+          {isSubmitting ? "Submitting..." : "Submit Feedback"}
         </Button>
       </form>
     </div>

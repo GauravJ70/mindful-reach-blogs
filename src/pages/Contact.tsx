@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
+import { submitContactForm } from "@/services/contactService";
 
 const ContactPage = () => {
   const { toast } = useToast();
@@ -26,6 +27,7 @@ const ContactPage = () => {
   });
   
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -75,26 +77,47 @@ const ContactPage = () => {
     return Object.keys(newErrors).length === 0;
   };
   
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (validateForm()) {
-      console.log("Form submitted:", formData);
+      setIsSubmitting(true);
       
-      // Show success message
-      toast({
-        title: "Message sent!",
-        description: "Thank you for reaching out. We'll get back to you soon.",
-      });
-      
-      // Reset form
-      setFormData({
-        name: "",
-        email: "",
-        subject: "",
-        message: "",
-        needsResponse: false
-      });
+      try {
+        // Submit to Supabase and send email
+        await submitContactForm({
+          name: formData.name,
+          email: formData.email,
+          subject: formData.subject,
+          message: `${formData.message}\n\n${formData.needsResponse ? "User has requested a response." : ""}`,
+        });
+        
+        // Show success message
+        toast({
+          title: "Message sent!",
+          description: "Thank you for reaching out. We'll get back to you soon.",
+        });
+        
+        // Reset form
+        setFormData({
+          name: "",
+          email: "",
+          subject: "",
+          message: "",
+          needsResponse: false
+        });
+      } catch (error) {
+        console.error("Error submitting contact form:", error);
+        
+        // Show error message
+        toast({
+          title: "Form submission failed",
+          description: "There was an error sending your message. Please try again.",
+          variant: "destructive",
+        });
+      } finally {
+        setIsSubmitting(false);
+      }
     } else {
       // Show error message
       toast({
@@ -230,8 +253,8 @@ const ContactPage = () => {
             </div>
           </div>
           
-          <Button type="submit" className="w-full md:w-auto">
-            Send Message
+          <Button type="submit" className="w-full md:w-auto" disabled={isSubmitting}>
+            {isSubmitting ? "Sending..." : "Send Message"}
           </Button>
         </form>
       </div>

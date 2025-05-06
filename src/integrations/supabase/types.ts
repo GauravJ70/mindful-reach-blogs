@@ -9,13 +9,176 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      accessibility_logs: {
+        Row: {
+          action: string
+          feature: string
+          id: string
+          logged_at: string
+          user_id: string | null
+          value: string | null
+        }
+        Insert: {
+          action: string
+          feature: string
+          id?: string
+          logged_at?: string
+          user_id?: string | null
+          value?: string | null
+        }
+        Update: {
+          action?: string
+          feature?: string
+          id?: string
+          logged_at?: string
+          user_id?: string | null
+          value?: string | null
+        }
+        Relationships: []
+      }
+      contact_messages: {
+        Row: {
+          email: string
+          id: string
+          message: string
+          name: string
+          sent_at: string
+          subject: string
+        }
+        Insert: {
+          email: string
+          id?: string
+          message: string
+          name: string
+          sent_at?: string
+          subject: string
+        }
+        Update: {
+          email?: string
+          id?: string
+          message?: string
+          name?: string
+          sent_at?: string
+          subject?: string
+        }
+        Relationships: []
+      }
+      feedback: {
+        Row: {
+          comment: string | null
+          email: string | null
+          id: string
+          name: string | null
+          post_id: string
+          rating: number
+          status: string | null
+          submitted_at: string
+        }
+        Insert: {
+          comment?: string | null
+          email?: string | null
+          id?: string
+          name?: string | null
+          post_id: string
+          rating: number
+          status?: string | null
+          submitted_at?: string
+        }
+        Update: {
+          comment?: string | null
+          email?: string | null
+          id?: string
+          name?: string | null
+          post_id?: string
+          rating?: number
+          status?: string | null
+          submitted_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "feedback_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      posts: {
+        Row: {
+          author: string
+          content: string
+          cover_image_url: string | null
+          created_at: string
+          id: string
+          published_at: string | null
+          tags: string[] | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          author: string
+          content: string
+          cover_image_url?: string | null
+          created_at?: string
+          id?: string
+          published_at?: string | null
+          tags?: string[] | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          author?: string
+          content?: string
+          cover_image_url?: string | null
+          created_at?: string
+          id?: string
+          published_at?: string | null
+          tags?: string[] | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          email: string
+          id: string
+          is_admin: boolean | null
+          name: string | null
+          updated_at: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          email: string
+          id: string
+          is_admin?: boolean | null
+          name?: string | null
+          updated_at?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          email?: string
+          id?: string
+          is_admin?: boolean | null
+          name?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      is_admin: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never
