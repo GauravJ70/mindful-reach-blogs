@@ -40,8 +40,9 @@ export async function fetchPosts(): Promise<BlogPost[]> {
     // Extract profile name safely
     let profileName = null;
     if (post.profiles) {
-      if (typeof post.profiles === 'object') {
-        profileName = post.profiles.name;
+      const profiles = post.profiles as { name?: string } | null;
+      if (profiles && typeof profiles === 'object') {
+        profileName = profiles.name;
       }
     }
       
@@ -87,8 +88,9 @@ export async function fetchPostById(id: string): Promise<BlogPostDetails | null>
   // Extract profile name safely
   let profileName = null;
   if (data.profiles) {
-    if (typeof data.profiles === 'object') {
-      profileName = data.profiles.name;
+    const profiles = data.profiles as { name?: string } | null;
+    if (profiles && typeof profiles === 'object') {
+      profileName = profiles.name;
     }
   }
   

@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -50,6 +49,7 @@ const Header = () => {
   const navItems = [
     { label: "Home", path: "/" },
     { label: "Blog", path: "/blog" },
+    { label: "Author", path: "/author" },
     { label: "About", path: "/about" },
     { label: "Contact", path: "/contact" },
   ];

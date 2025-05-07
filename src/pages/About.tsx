@@ -15,7 +15,7 @@ const AboutPage = () => {
             poster="https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=1200"
             aria-label="Video showcasing our commitment to accessibility"
           >
-            <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" type="video/mp4" />
+            <source src="https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" type="video/mp4" />
             <track 
               kind="captions" 
               src="/captions/about-video.vtt" 

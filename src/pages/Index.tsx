@@ -1,14 +1,60 @@
 
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import BlogCard from "@/components/blog/BlogCard";
 import { blogPosts } from "@/data/blogPosts";
 import { Search } from "lucide-react";
+import { useEffect, useState } from "react";
+import { fetchPosts, BlogPost } from "@/services/blogService";
+import { useToast } from "@/components/ui/use-toast";
 
 const HomePage = () => {
-  const featuredPosts = blogPosts.slice(0, 1);
-  const recentPosts = blogPosts.slice(1, 7);
+  const [featuredPosts, setFeaturedPosts] = useState<BlogPost[]>([]);
+  const [recentPosts, setRecentPosts] = useState<BlogPost[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  useEffect(() => {
+    const loadPosts = async () => {
+      try {
+        setIsLoading(true);
+        const allPosts = await fetchPosts();
+        
+        if (allPosts.length > 0) {
+          setFeaturedPosts(allPosts.slice(0, 1));
+          setRecentPosts(allPosts.slice(1, 7));
+        } else {
+          // Fallback to static data if no posts are returned
+          setFeaturedPosts(blogPosts.slice(0, 1));
+          setRecentPosts(blogPosts.slice(1, 7));
+        }
+      } catch (error) {
+        console.error("Error loading posts:", error);
+        // Fallback to static data on error
+        setFeaturedPosts(blogPosts.slice(0, 1));
+        setRecentPosts(blogPosts.slice(1, 7));
+        
+        toast({
+          title: "Error loading posts",
+          description: "Using sample data instead. Please try again later.",
+          variant: "destructive",
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadPosts();
+  }, [toast]);
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    const formData = new FormData(e.target as HTMLFormElement);
+    const searchQuery = formData.get('search') as string;
+    navigate(`/blog?search=${encodeURIComponent(searchQuery)}`);
+  };
 
   return (
     <div>
@@ -36,12 +82,10 @@ const HomePage = () => {
             <form 
               className="relative" 
               role="search"
-              onSubmit={(e) => {
-                e.preventDefault();
-                // Handle search
-              }}
+              onSubmit={handleSearch}
             >
               <Input
+                name="search"
                 type="search"
                 placeholder="Search articles..."
                 aria-label="Search articles"
@@ -64,7 +108,9 @@ const HomePage = () => {
       <section className="py-8">
         <h2 className="text-3xl font-bold mb-8">Featured Article</h2>
         <div className="grid grid-cols-1 gap-6">
-          {featuredPosts.map((post) => (
+          {isLoading ? (
+            <div className="h-64 bg-muted animate-pulse rounded-lg"></div>
+          ) : featuredPosts.map((post) => (
             <BlogCard key={post.id} post={post} featured={true} />
           ))}
         </div>
@@ -81,7 +127,11 @@ const HomePage = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {recentPosts.map((post) => (
+          {isLoading ? (
+            Array(6).fill(0).map((_, i) => (
+              <div key={i} className="h-64 bg-muted animate-pulse rounded-lg"></div>
+            ))
+          ) : recentPosts.map((post) => (
             <BlogCard key={post.id} post={post} />
           ))}
         </div>
@@ -104,9 +154,14 @@ const HomePage = () => {
               MindfulReach is dedicated to creating content that is accessible to everyone, regardless of ability.
               We follow WCAG 2.1 guidelines and continuously work to improve our platform's accessibility.
             </p>
-            <Link to="/about">
-              <Button>Learn More About Our Mission</Button>
-            </Link>
+            <div className="space-x-4">
+              <Link to="/about">
+                <Button className="mb-2 md:mb-0">Learn About Our Mission</Button>
+              </Link>
+              <Link to="/author">
+                <Button variant="outline">Meet Our Author</Button>
+              </Link>
+            </div>
           </div>
         </div>
       </section>

@@ -17,6 +17,7 @@ const BlogPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
   const [allTags, setAllTags] = useState<string[]>([]);
+  const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
 
   // Fetch posts from Supabase
@@ -24,7 +25,10 @@ const BlogPage = () => {
     const getPosts = async () => {
       try {
         setIsLoading(true);
+        setError(null);
+        console.log("Fetching posts...");
         const posts = await fetchPosts();
+        console.log("Fetched posts:", posts);
         setBlogPosts(posts);
 
         // Extract all unique tags
@@ -32,6 +36,7 @@ const BlogPage = () => {
         setAllTags(tags);
       } catch (error: any) {
         console.error("Error fetching posts:", error);
+        setError(error.message || "Failed to load blog posts");
         toast({
           title: "Error loading posts",
           description: error.message || "Failed to load blog posts",
@@ -130,6 +135,14 @@ const BlogPage = () => {
       {isLoading ? (
         <div className="flex justify-center items-center py-12">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      ) : error ? (
+        <div className="text-center py-12">
+          <h2 className="text-2xl font-bold mb-2">Error loading articles</h2>
+          <p className="text-muted-foreground mb-6">{error}</p>
+          <Button onClick={() => window.location.reload()}>
+            Try Again
+          </Button>
         </div>
       ) : filteredPosts.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
