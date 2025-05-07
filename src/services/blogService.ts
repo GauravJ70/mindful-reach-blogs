@@ -37,8 +37,8 @@ export async function fetchPosts(): Promise<BlogPost[]> {
   }
   
   const posts = data.map(post => {
-    // Use optional chaining and nullish coalescing to safely access potentially undefined properties
-    const profileName = post.profiles && typeof post.profiles === 'object' 
+    // Check if profiles exists and is an object before trying to access its properties
+    const profileName = post.profiles && typeof post.profiles === 'object' && post.profiles !== null
       ? post.profiles.name 
       : null;
       
@@ -81,8 +81,8 @@ export async function fetchPostById(id: string): Promise<BlogPostDetails | null>
     throw new Error("Failed to fetch blog post");
   }
 
-  // Use optional chaining and nullish coalescing to safely access potentially undefined properties
-  const profileName = data.profiles && typeof data.profiles === 'object'
+  // Check if profiles exists and is an object before trying to access its properties
+  const profileName = data.profiles && typeof data.profiles === 'object' && data.profiles !== null
     ? data.profiles.name 
     : null;
   
