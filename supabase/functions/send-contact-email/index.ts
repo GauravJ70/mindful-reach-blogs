@@ -30,6 +30,19 @@ serve(async (req) => {
       );
     }
 
+    // Create a Supabase client to store the message
+    const supabaseUrl = Deno.env.get("SUPABASE_URL") as string;
+    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") as string;
+    const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
+
+    // Store the contact message in the database (as a backup)
+    await supabaseAdmin.from("contact_messages").insert({
+      name,
+      email,
+      subject,
+      message
+    });
+
     // Here you would typically use an email service like SendGrid, Resend, or a similar service
     // For now, we'll just log the email details
     console.log(`
