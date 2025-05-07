@@ -37,10 +37,13 @@ export async function fetchPosts(): Promise<BlogPost[]> {
   }
   
   const posts = data.map(post => {
-    // Check if profiles exists and is an object before trying to access its properties
-    const profileName = post.profiles && typeof post.profiles === 'object' && post.profiles !== null
-      ? post.profiles.name 
-      : null;
+    // Extract profile name safely
+    let profileName = null;
+    if (post.profiles) {
+      if (typeof post.profiles === 'object') {
+        profileName = post.profiles.name;
+      }
+    }
       
     return {
       id: post.id,
@@ -81,10 +84,13 @@ export async function fetchPostById(id: string): Promise<BlogPostDetails | null>
     throw new Error("Failed to fetch blog post");
   }
 
-  // Check if profiles exists and is an object before trying to access its properties
-  const profileName = data.profiles && typeof data.profiles === 'object' && data.profiles !== null
-    ? data.profiles.name 
-    : null;
+  // Extract profile name safely
+  let profileName = null;
+  if (data.profiles) {
+    if (typeof data.profiles === 'object') {
+      profileName = data.profiles.name;
+    }
+  }
   
   return {
     id: data.id,
