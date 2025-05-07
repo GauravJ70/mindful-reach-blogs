@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -38,8 +39,14 @@ const ContactPage = () => {
   const onSubmit = async (data: ContactFormValues) => {
     try {
       setIsSubmitting(true);
-      // Now data fully matches the ContactSubmission interface
-      await submitContactForm(data);
+      // The data from the form now exactly matches the ContactSubmission interface
+      const contactData: ContactSubmission = {
+        name: data.name,
+        email: data.email,
+        subject: data.subject,
+        message: data.message
+      };
+      await submitContactForm(contactData);
       form.reset();
       toast({
         title: "Message Sent",
