@@ -1,6 +1,16 @@
 
 import { supabase } from "@/integrations/supabase/client";
-import { BlogPost } from "@/components/blog/BlogCard";
+
+export interface BlogPost {
+  id: string;
+  title: string;
+  summary: string;
+  date: string;
+  imageUrl: string;
+  author: string;
+  authorId: string;
+  tags: string[];
+}
 
 export interface BlogPostDetails extends BlogPost {
   content: string;
@@ -16,7 +26,8 @@ export async function fetchPosts(): Promise<BlogPost[]> {
       cover_image_url,
       published_at,
       tags,
-      author
+      author,
+      profiles(name)
     `)
     .order("published_at", { ascending: false });
   
@@ -25,24 +36,18 @@ export async function fetchPosts(): Promise<BlogPost[]> {
     throw new Error("Failed to fetch blog posts");
   }
   
-  // We need to fetch author names separately since we have a join issue
-  const posts = await Promise.all(data.map(async (post) => {
-    const { data: authorData } = await supabase
-      .from("profiles")
-      .select("name")
-      .eq("id", post.author)
-      .single();
-    
+  const posts = data.map(post => {
     return {
       id: post.id,
       title: post.title,
       summary: post.content.substring(0, 150) + "...",
       date: post.published_at,
       imageUrl: post.cover_image_url || "https://images.unsplash.com/photo-1499750310107-5fef28a66643",
-      author: authorData?.name || "Unknown Author",
+      author: post.profiles?.name || "Unknown Author",
+      authorId: post.author,
       tags: post.tags || []
     };
-  }));
+  });
   
   return posts;
 }
@@ -57,7 +62,8 @@ export async function fetchPostById(id: string): Promise<BlogPostDetails | null>
       cover_image_url,
       published_at,
       tags,
-      author
+      author,
+      profiles(name)
     `)
     .eq("id", id)
     .single();
@@ -70,13 +76,6 @@ export async function fetchPostById(id: string): Promise<BlogPostDetails | null>
     throw new Error("Failed to fetch blog post");
   }
   
-  // Fetch author name separately
-  const { data: authorData } = await supabase
-    .from("profiles")
-    .select("name")
-    .eq("id", data.author)
-    .single();
-  
   return {
     id: data.id,
     title: data.title,
@@ -84,7 +83,8 @@ export async function fetchPostById(id: string): Promise<BlogPostDetails | null>
     summary: data.content.substring(0, 150) + "...",
     date: data.published_at,
     imageUrl: data.cover_image_url || "https://images.unsplash.com/photo-1499750310107-5fef28a66643",
-    author: authorData?.name || "Unknown Author",
+    author: data.profiles?.name || "Unknown Author",
+    authorId: data.author,
     tags: data.tags || []
   };
 }

@@ -113,8 +113,8 @@ const AuthPage = () => {
     <div className="max-w-md mx-auto mt-12">
       <Card>
         <CardHeader>
-          <CardTitle className="text-2xl font-bold">Welcome</CardTitle>
-          <CardDescription>Sign in or create an account to continue</CardDescription>
+          <CardTitle className="text-2xl font-bold">Welcome to AccessiBlog</CardTitle>
+          <CardDescription>Sign in or create an account to share your accessibility insights</CardDescription>
         </CardHeader>
         
         <Tabs value={authMode} onValueChange={(value) => setAuthMode(value as "login" | "signup")}>
@@ -279,7 +279,8 @@ const AuthPage = () => {
         </Tabs>
         
         <CardFooter className="text-center text-sm text-muted-foreground">
-          This is a secure authentication system powered by Supabase.
+          Accessibility is at the core of our platform. We are committed to making content 
+          accessible to everyone.
         </CardFooter>
       </Card>
     </div>

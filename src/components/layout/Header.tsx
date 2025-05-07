@@ -1,14 +1,26 @@
 
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, Menu, X } from "lucide-react";
+import { Search, Menu, X, LogOut, Plus } from "lucide-react";
 import AccessibilitySettings from "../accessibility/AccessibilitySettings";
+import { useAuth } from "@/context/AuthContext";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
+  const { user, signOut, isAdmin } = useAuth();
+  const navigate = useNavigate();
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -16,8 +28,23 @@ const Header = () => {
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Search for:", searchValue);
-    // Add search functionality here
+    navigate(`/blog?search=${encodeURIComponent(searchValue)}`);
+    setSearchValue("");
+    setIsMenuOpen(false);
+  };
+
+  const getInitials = (name: string = "User") => {
+    return name
+      .split(" ")
+      .map(part => part[0])
+      .join("")
+      .toUpperCase()
+      .substring(0, 2);
+  };
+
+  const handleLogout = async () => {
+    await signOut();
+    navigate("/");
   };
 
   const navItems = [
@@ -25,7 +52,6 @@ const Header = () => {
     { label: "Blog", path: "/blog" },
     { label: "About", path: "/about" },
     { label: "Contact", path: "/contact" },
-    { label: "Author", path: "/author" },
   ];
 
   return (
@@ -39,7 +65,7 @@ const Header = () => {
             aria-label="MindfulReach Blog"
           >
             <span className="font-bold text-lg md:text-2xl bg-clip-text text-transparent bg-gradient-to-r from-blog-blue to-blog-blue-dark">
-              MindfulReach
+              AccessiBlog
             </span>
           </Link>
 
@@ -54,6 +80,15 @@ const Header = () => {
                 {item.label}
               </Link>
             ))}
+            {user && (
+              <Link
+                to="/blog/create"
+                className="flex items-center text-base font-medium transition-colors hover:text-primary no-underline"
+              >
+                <Plus size={18} className="mr-1" />
+                New Post
+              </Link>
+            )}
           </nav>
 
           {/* Desktop Search and Settings */}
@@ -79,10 +114,58 @@ const Header = () => {
               </Button>
             </form>
             <AccessibilitySettings />
+
+            {user ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="rounded-full">
+                    <Avatar className="h-8 w-8">
+                      <AvatarImage src={user.user_metadata?.avatar_url} alt={user.user_metadata?.name || "User"} />
+                      <AvatarFallback>{getInitials(user.user_metadata?.name)}</AvatarFallback>
+                    </Avatar>
+                    <span className="sr-only">User menu</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuLabel>
+                    {user.user_metadata?.name || user.email}
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link to="/profile">Profile</Link>
+                  </DropdownMenuItem>
+                  {isAdmin && (
+                    <DropdownMenuItem asChild>
+                      <Link to="/admin">Admin Dashboard</Link>
+                    </DropdownMenuItem>
+                  )}
+                  <DropdownMenuItem asChild>
+                    <Link to="/blog/create">Create New Post</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleLogout} className="text-destructive">
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Logout
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Button onClick={() => navigate("/auth")} variant="default">
+                Sign In
+              </Button>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
           <div className="md:hidden flex items-center">
+            {user && (
+              <Button variant="ghost" size="icon" className="mr-2" onClick={() => navigate("/profile")}>
+                <Avatar className="h-8 w-8">
+                  <AvatarImage src={user.user_metadata?.avatar_url} alt={user.user_metadata?.name || "User"} />
+                  <AvatarFallback>{getInitials(user.user_metadata?.name)}</AvatarFallback>
+                </Avatar>
+              </Button>
+            )}
             <Button
               variant="ghost"
               size="icon"
@@ -118,6 +201,45 @@ const Header = () => {
                   {item.label}
                 </Link>
               ))}
+              {user && (
+                <>
+                  <Link
+                    to="/blog/create"
+                    className="block py-2 px-3 text-base font-medium rounded-md hover:bg-accent no-underline"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    <Plus size={18} className="inline-block mr-1" />
+                    New Post
+                  </Link>
+                  <Link
+                    to="/profile"
+                    className="block py-2 px-3 text-base font-medium rounded-md hover:bg-accent no-underline"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Profile
+                  </Link>
+                  {isAdmin && (
+                    <Link
+                      to="/admin"
+                      className="block py-2 px-3 text-base font-medium rounded-md hover:bg-accent no-underline"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      Admin Dashboard
+                    </Link>
+                  )}
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-start py-2 px-3 text-base font-medium rounded-md hover:bg-accent text-destructive"
+                    onClick={() => {
+                      handleLogout();
+                      setIsMenuOpen(false);
+                    }}
+                  >
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Logout
+                  </Button>
+                </>
+              )}
             </div>
             <div className="pt-2 pb-3 space-y-4">
               <form onSubmit={handleSearchSubmit} className="relative">
@@ -142,6 +264,14 @@ const Header = () => {
               <div className="flex justify-start">
                 <AccessibilitySettings />
               </div>
+              {!user && (
+                <Button onClick={() => { 
+                  navigate("/auth");
+                  setIsMenuOpen(false);
+                }} className="w-full">
+                  Sign In
+                </Button>
+              )}
             </div>
           </div>
         </div>

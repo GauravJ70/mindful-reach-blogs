@@ -1,79 +1,60 @@
 
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.5.0";
+import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
 
-// CORS headers for browser requests
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+interface ContactEmailRequest {
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+}
+
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders, status: 204 });
+    return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    // Parse the request body
-    const body = await req.json();
-    const { name, email, subject, message } = body;
+    const { name, email, subject, message }: ContactEmailRequest = await req.json();
 
-    // Validate required fields
-    if (!name || !email || !subject || !message) {
-      return new Response(
-        JSON.stringify({ error: "Missing required fields" }),
-        { 
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-          status: 400 
-        }
-      );
-    }
+    // For now, let's log the data since we don't have email setup yet
+    console.log("Contact form submission:", { name, email, subject, message });
 
-    // Create a Supabase client to store the message
-    const supabaseUrl = Deno.env.get("SUPABASE_URL") as string;
-    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") as string;
-    const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
+    // In a real application, you would send an email using your preferred provider
+    // Example with Resend:
+    // const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
+    // await resend.emails.send({
+    //   from: "AccessiBlog <no-reply@accessiblog.com>",
+    //   to: "gauravjadhav0900@gmail.com",
+    //   subject: `New contact form: ${subject}`,
+    //   html: `<h1>New message from ${name}</h1>
+    //          <p><strong>Email:</strong> ${email}</p>
+    //          <p><strong>Subject:</strong> ${subject}</p>
+    //          <p><strong>Message:</strong></p>
+    //          <p>${message}</p>`,
+    // });
 
-    // Store the contact message in the database (as a backup)
-    await supabaseAdmin.from("contact_messages").insert({
-      name,
-      email,
-      subject,
-      message
-    });
-
-    // Here you would typically use an email service like SendGrid, Resend, or a similar service
-    // For now, we'll just log the email details
-    console.log(`
-      To: gauravjadhav0900@gmail.com
-      From: ${email}
-      Name: ${name}
-      Subject: ${subject}
-      
-      ${message}
-    `);
-
-    // You would implement actual email sending here
-    // For example with Resend.com, Mailgun, SendGrid, etc.
-
-    // Return a success response
     return new Response(
-      JSON.stringify({ success: true }),
+      JSON.stringify({ success: true, message: "Contact form received" }),
       { 
+        status: 200, 
         headers: { ...corsHeaders, "Content-Type": "application/json" },
-        status: 200 
-      }
+      },
     );
   } catch (error) {
-    console.error("Error processing contact form:", error);
+    console.error("Error in send-contact-email function:", error);
     
     return new Response(
-      JSON.stringify({ error: "Failed to process contact form submission" }),
+      JSON.stringify({ success: false, error: error.message }),
       { 
+        status: 500, 
         headers: { ...corsHeaders, "Content-Type": "application/json" },
-        status: 500 
-      }
+      },
     );
   }
 });

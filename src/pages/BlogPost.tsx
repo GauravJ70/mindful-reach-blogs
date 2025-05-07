@@ -1,23 +1,97 @@
 
 import { useParams, Link, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { CalendarIcon, ArrowLeft, User } from "lucide-react";
-import { blogPosts } from "@/data/blogPosts";
-import FeedbackForm from "@/components/blog/FeedbackForm";
+import { CalendarIcon, ArrowLeft, User, Edit, Trash2 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
-import { useEffect } from "react";
+import FeedbackForm from "@/components/blog/FeedbackForm";
+import { fetchPostById, BlogPostDetails, deletePost } from "@/services/blogService";
+import { useToast } from "@/components/ui/use-toast";
+import { useAuth } from "@/context/AuthContext";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 const BlogPostPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { toast } = useToast();
+  const { user } = useAuth();
+  const [post, setPost] = useState<BlogPostDetails | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isDeleting, setIsDeleting] = useState(false);
   
-  const post = blogPosts.find((post) => post.id === id);
-
+  // Check if the current user is the author of the post
+  const isAuthor = user && post?.authorId === user.id;
+  
   useEffect(() => {
     // Scroll to top when post changes
     window.scrollTo(0, 0);
-  }, [id]);
+    
+    const getPost = async () => {
+      if (!id) return;
+      
+      try {
+        setIsLoading(true);
+        const postData = await fetchPostById(id);
+        setPost(postData);
+      } catch (error: any) {
+        console.error("Error fetching post:", error);
+        toast({
+          title: "Error loading post",
+          description: error.message || "Failed to load blog post",
+          variant: "destructive",
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    getPost();
+  }, [id, toast]);
+
+  const handleDelete = async () => {
+    if (!id) return;
+    
+    try {
+      setIsDeleting(true);
+      await deletePost(id);
+      toast({
+        title: "Post deleted",
+        description: "The blog post has been successfully deleted.",
+      });
+      navigate("/blog");
+    } catch (error: any) {
+      console.error("Error deleting post:", error);
+      toast({
+        title: "Error deleting post",
+        description: error.message || "Failed to delete blog post",
+        variant: "destructive",
+      });
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center min-h-[60vh]">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary mx-auto"></div>
+          <p className="mt-4 text-muted-foreground">Loading article...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!post) {
     return (
@@ -49,10 +123,54 @@ const BlogPostPage = () => {
             <time dateTime={post.date}>{new Date(post.date).toLocaleDateString()}</time>
           </div>
           <span aria-hidden="true">•</span>
-          <Link to="/author" className="flex items-center hover:text-primary">
+          <div className="flex items-center">
             <User className="h-4 w-4 mr-1" aria-hidden="true" />
-            {post.author}
-          </Link>
+            <span>{post.author}</span>
+          </div>
+          
+          {isAuthor && (
+            <div className="ml-auto flex gap-2">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => navigate(`/blog/edit/${post.id}`)}
+              >
+                <Edit className="h-4 w-4 mr-1" />
+                Edit
+              </Button>
+              
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button 
+                    variant="destructive" 
+                    size="sm"
+                  >
+                    <Trash2 className="h-4 w-4 mr-1" />
+                    Delete
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This action cannot be undone. This will permanently delete your blog post
+                      and remove it from our servers.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={handleDelete}
+                      disabled={isDeleting}
+                      className="bg-destructive text-destructive-foreground"
+                    >
+                      {isDeleting ? "Deleting..." : "Delete"}
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </div>
+          )}
         </div>
         
         <div className="flex flex-wrap gap-2 mb-6">
@@ -63,99 +181,22 @@ const BlogPostPage = () => {
           ))}
         </div>
         
-        <div className="aspect-[2/1] overflow-hidden rounded-lg mb-6">
-          <img 
-            src={post.imageUrl} 
-            alt={`Cover image for ${post.title}`}
-            className="w-full h-full object-cover"
-          />
-        </div>
+        {post.imageUrl && (
+          <div className="aspect-[2/1] overflow-hidden rounded-lg mb-6">
+            <img 
+              src={post.imageUrl} 
+              alt={`Cover image for ${post.title}`}
+              className="w-full h-full object-cover"
+            />
+          </div>
+        )}
       </header>
 
       <div className="prose prose-lg max-w-none mb-12">
-        <p className="text-xl font-medium mb-6">{post.summary}</p>
-        
-        {/* Simulated blog content - in a real app this would be pulled from a CMS or database */}
-        <h2>Introduction to Accessibility</h2>
-        <p>
-          Web accessibility means that websites, tools, and technologies are designed and developed so that people with disabilities can use them. More specifically, people can perceive, understand, navigate, and interact with the Web and contribute to the Web.
-        </p>
-
-        <div className="my-6 md:flex gap-6 items-center">
-          <div className="md:w-1/2 mb-4 md:mb-0">
-            <img 
-              src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=80&w=800" 
-              alt="A person using a screen reader while browsing the web on a laptop with an enlarged text display" 
-              className="rounded-lg w-full"
-            />
-          </div>
-          <div className="md:w-1/2">
-            <p>
-              Accessibility encompasses all disabilities that affect access to the Web, including visual, auditory, physical, speech, cognitive, and neurological disabilities.
-            </p>
-          </div>
-        </div>
-        
-        <h2>Why Accessibility Matters</h2>
-        <p>
-          The Web is an increasingly important resource in many aspects of life: education, employment, government, commerce, health care, recreation, and more. It is essential that the Web be accessible in order to provide equal access and equal opportunity to people with diverse abilities.
-        </p>
-        <p>
-          Access to information and communications technologies, including the Web, is defined as a basic human right in the United Nations Convention on the Rights of Persons with Disabilities (UN CRPD).
-        </p>
-
-        <figure className="my-8">
-          <img 
-            src="https://images.unsplash.com/photo-1573496773905-f5b17e717f05?q=80&w=1200" 
-            alt="A person in a wheelchair using a tablet with specialized mounts and an adaptive stylus" 
-            className="rounded-lg w-full"
-          />
-          <figcaption className="text-sm text-center text-muted-foreground mt-2">
-            Adaptive technology enables independence and digital participation for everyone
-          </figcaption>
-        </figure>
-
-        <h2>Key Principles</h2>
-        <ul>
-          <li><strong>Perceivable</strong>: Information and user interface components must be presentable to users in ways they can perceive.</li>
-          <li><strong>Operable</strong>: User interface components and navigation must be operable.</li>
-          <li><strong>Understandable</strong>: Information and the operation of user interface must be understandable.</li>
-          <li><strong>Robust</strong>: Content must be robust enough that it can be interpreted by a wide variety of user agents, including assistive technologies.</li>
-        </ul>
-
-        <h2>Implementation in Practice</h2>
-        <p>
-          Implementing accessibility principles requires attention to detail throughout the development process. From design to deployment, considering accessibility at each step ensures that the final product is usable by everyone.
-        </p>
+        <div dangerouslySetInnerHTML={{ __html: post.content }} />
       </div>
       
       <Separator className="my-8" />
-
-      <section aria-labelledby="related-heading" className="mb-12">
-        <h2 id="related-heading" className="text-2xl font-bold mb-6">Related Articles</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {blogPosts
-            .filter(p => p.id !== post.id && p.tags.some(t => post.tags.includes(t)))
-            .slice(0, 2)
-            .map((relatedPost) => (
-              <div key={relatedPost.id} className="border rounded-lg overflow-hidden">
-                <Link to={`/blog/${relatedPost.id}`} className="block no-underline">
-                  <div className="aspect-[3/2]">
-                    <img 
-                      src={relatedPost.imageUrl} 
-                      alt={`Cover image for ${relatedPost.title}`} 
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <div className="p-4">
-                    <h3 className="font-bold text-lg mb-2">{relatedPost.title}</h3>
-                    <p className="text-sm text-muted-foreground line-clamp-2">{relatedPost.summary}</p>
-                  </div>
-                </Link>
-              </div>
-            ))}
-        </div>
-      </section>
 
       <FeedbackForm postId={post.id} />
     </article>

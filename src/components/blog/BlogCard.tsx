@@ -11,6 +11,7 @@ export interface BlogPost {
   date: string;
   imageUrl: string;
   author: string;
+  authorId: string;
   tags: string[];
 }
 

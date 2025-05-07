@@ -3,285 +3,209 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useToast } from "@/components/ui/use-toast";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Loader2 } from "lucide-react";
 import { submitContactForm } from "@/services/contactService";
+
+const contactSchema = z.object({
+  name: z.string().min(2, { message: "Name must be at least 2 characters" }),
+  email: z.string().email({ message: "Please enter a valid email address" }),
+  subject: z.string().min(5, { message: "Subject must be at least 5 characters" }),
+  message: z.string().min(10, { message: "Message must be at least 10 characters" }),
+});
+
+type ContactFormValues = z.infer<typeof contactSchema>;
 
 const ContactPage = () => {
   const { toast } = useToast();
-  
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    subject: "",
-    message: "",
-    needsResponse: false
-  });
-  
-  const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-    
-    // Clear error when field is edited
-    if (errors[name]) {
-      setErrors((prev) => ({ ...prev, [name]: "" }));
-    }
-  };
-  
-  const handleSelectChange = (value: string) => {
-    setFormData((prev) => ({ ...prev, subject: value }));
-    
-    // Clear error when field is edited
-    if (errors.subject) {
-      setErrors((prev) => ({ ...prev, subject: "" }));
-    }
-  };
-  
-  const handleCheckboxChange = (checked: boolean) => {
-    setFormData((prev) => ({ ...prev, needsResponse: checked }));
-  };
-  
-  const validateForm = (): boolean => {
-    const newErrors: Record<string, string> = {};
-    
-    if (!formData.name.trim()) {
-      newErrors.name = "Name is required";
-    }
-    
-    if (!formData.email.trim()) {
-      newErrors.email = "Email is required";
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = "Please enter a valid email address";
-    }
-    
-    if (!formData.subject) {
-      newErrors.subject = "Subject is required";
-    }
-    
-    if (!formData.message.trim()) {
-      newErrors.message = "Message is required";
-    }
-    
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-  
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (validateForm()) {
+
+  const form = useForm<ContactFormValues>({
+    resolver: zodResolver(contactSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      subject: "",
+      message: "",
+    },
+  });
+
+  const onSubmit = async (data: ContactFormValues) => {
+    try {
       setIsSubmitting(true);
-      
-      try {
-        // Submit to Supabase and send email
-        await submitContactForm({
-          name: formData.name,
-          email: formData.email,
-          subject: formData.subject,
-          message: `${formData.message}\n\n${formData.needsResponse ? "User has requested a response." : ""}`,
-        });
-        
-        // Show success message
-        toast({
-          title: "Message sent!",
-          description: "Thank you for reaching out. We'll get back to you soon.",
-        });
-        
-        // Reset form
-        setFormData({
-          name: "",
-          email: "",
-          subject: "",
-          message: "",
-          needsResponse: false
-        });
-      } catch (error) {
-        console.error("Error submitting contact form:", error);
-        
-        // Show error message
-        toast({
-          title: "Form submission failed",
-          description: "There was an error sending your message. Please try again.",
-          variant: "destructive",
-        });
-      } finally {
-        setIsSubmitting(false);
-      }
-    } else {
-      // Show error message
+      await submitContactForm(data);
+      form.reset();
       toast({
-        title: "Form submission failed",
-        description: "Please check the form for errors and try again.",
+        title: "Message Sent",
+        description: "Thank you for contacting us. We'll respond to your inquiry soon.",
+      });
+    } catch (error: any) {
+      console.error("Contact form error:", error);
+      toast({
+        title: "Failed to send message",
+        description: error.message || "There was a problem sending your message. Please try again later.",
         variant: "destructive",
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
-  
+
   return (
-    <div className="max-w-3xl mx-auto">
-      <h1 className="text-4xl font-bold mb-6">Contact Us</h1>
-      
-      <p className="mb-8 text-lg">
-        Have questions, suggestions, or feedback? We'd love to hear from you! Use the form below to get in touch with our team.
+    <div className="container py-8 max-w-3xl mx-auto">
+      <h1 className="text-4xl font-bold mb-4">Contact Us</h1>
+      <p className="text-lg text-muted-foreground mb-8">
+        Have questions, feedback, or need assistance with accessibility? We're here to help.
       </p>
-      
-      <div className="border rounded-lg p-6 bg-card">
-        <form onSubmit={handleSubmit} className="space-y-6" noValidate>
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="name" className="block mb-2">
-                Name <span aria-hidden="true" className="text-destructive">*</span>
-                <span className="sr-only">(required)</span>
-              </Label>
-              <Input
-                id="name"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                aria-required="true"
-                aria-invalid={!!errors.name}
-                aria-describedby={errors.name ? "name-error" : undefined}
-              />
-              {errors.name && (
-                <p id="name-error" className="text-sm text-destructive mt-1" role="alert">
-                  {errors.name}
-                </p>
-              )}
+
+      <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
+        <div>
+          <h2 className="text-xl font-semibold mb-4">Get In Touch</h2>
+          <p className="mb-6">
+            We welcome your questions, suggestions, and feedback about our content, accessibility features, and services.
+          </p>
+          
+          <div className="space-y-4 mb-8">
+            <h3 className="font-medium">Ways to Reach Us</h3>
+            <div className="flex items-start space-x-3">
+              <div className="bg-primary/10 p-2 rounded-full">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M22 12h-4l-3 9L9 3l-3 9H2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </div>
+              <div>
+                <h4 className="font-medium">Website</h4>
+                <p className="text-sm text-muted-foreground">accessiblog.com</p>
+              </div>
             </div>
             
-            <div>
-              <Label htmlFor="email" className="block mb-2">
-                Email <span aria-hidden="true" className="text-destructive">*</span>
-                <span className="sr-only">(required)</span>
-              </Label>
-              <Input
-                id="email"
-                name="email"
-                type="email"
-                value={formData.email}
-                onChange={handleChange}
-                aria-required="true"
-                aria-invalid={!!errors.email}
-                aria-describedby={errors.email ? "email-error" : undefined}
-              />
-              {errors.email && (
-                <p id="email-error" className="text-sm text-destructive mt-1" role="alert">
-                  {errors.email}
-                </p>
-              )}
+            <div className="flex items-start space-x-3">
+              <div className="bg-primary/10 p-2 rounded-full">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M22 6l-10 7L2 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </div>
+              <div>
+                <h4 className="font-medium">Email</h4>
+                <p className="text-sm text-muted-foreground">support@accessiblog.com</p>
+              </div>
             </div>
             
-            <div>
-              <Label htmlFor="subject" className="block mb-2">
-                Subject <span aria-hidden="true" className="text-destructive">*</span>
-                <span className="sr-only">(required)</span>
-              </Label>
-              <Select 
-                value={formData.subject} 
-                onValueChange={handleSelectChange}
-                aria-required="true"
-                aria-invalid={!!errors.subject}
-              >
-                <SelectTrigger 
-                  id="subject"
-                  aria-describedby={errors.subject ? "subject-error" : undefined}
-                >
-                  <SelectValue placeholder="Select a subject" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="general">General Inquiry</SelectItem>
-                  <SelectItem value="feedback">Website Feedback</SelectItem>
-                  <SelectItem value="accessibility">Accessibility Issue</SelectItem>
-                  <SelectItem value="suggestion">Content Suggestion</SelectItem>
-                  <SelectItem value="other">Other</SelectItem>
-                </SelectContent>
-              </Select>
-              {errors.subject && (
-                <p id="subject-error" className="text-sm text-destructive mt-1" role="alert">
-                  {errors.subject}
-                </p>
-              )}
-            </div>
-            
-            <div>
-              <Label htmlFor="message" className="block mb-2">
-                Message <span aria-hidden="true" className="text-destructive">*</span>
-                <span className="sr-only">(required)</span>
-              </Label>
-              <Textarea
-                id="message"
-                name="message"
-                value={formData.message}
-                onChange={handleChange}
-                rows={6}
-                aria-required="true"
-                aria-invalid={!!errors.message}
-                aria-describedby={errors.message ? "message-error" : undefined}
-              />
-              {errors.message && (
-                <p id="message-error" className="text-sm text-destructive mt-1" role="alert">
-                  {errors.message}
-                </p>
-              )}
-            </div>
-            
-            <div className="flex items-start space-x-2">
-              <Checkbox 
-                id="needsResponse" 
-                checked={formData.needsResponse}
-                onCheckedChange={handleCheckboxChange}
-              />
-              <div className="grid gap-1.5 leading-none">
-                <Label 
-                  htmlFor="needsResponse" 
-                  className="text-sm cursor-pointer"
-                >
-                  I would like to receive a response
-                </Label>
+            <div className="flex items-start space-x-3">
+              <div className="bg-primary/10 p-2 rounded-full">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                </svg>
+              </div>
+              <div>
+                <h4 className="font-medium">Social Media</h4>
+                <p className="text-sm text-muted-foreground">@AccessiBlog on all platforms</p>
               </div>
             </div>
           </div>
-          
-          <Button type="submit" className="w-full md:w-auto" disabled={isSubmitting}>
-            {isSubmitting ? "Sending..." : "Send Message"}
-          </Button>
-        </form>
-      </div>
-      
-      <div className="mt-10">
-        <h2 className="text-2xl font-bold mb-4">Other Ways to Reach Us</h2>
-        <div className="grid md:grid-cols-2 gap-6">
-          <div className="border rounded-lg p-6 bg-card">
-            <h3 className="text-xl font-bold mb-2">Accessibility Support</h3>
-            <p className="mb-3">
-              For urgent accessibility issues or if you need alternative ways to contact us:
-            </p>
-            <p className="mb-1">
-              <strong>Email:</strong> accessibility@mindfulreach.example.com
-            </p>
-          </div>
-          
-          <div className="border rounded-lg p-6 bg-card">
-            <h3 className="text-xl font-bold mb-2">Content Suggestions</h3>
-            <p className="mb-3">
-              Have an idea for an article or topic you'd like us to cover?
-            </p>
-            <p className="mb-1">
-              <strong>Email:</strong> content@mindfulreach.example.com
+
+          <div>
+            <h3 className="font-medium mb-2">Accessibility Feedback</h3>
+            <p className="text-sm text-muted-foreground">
+              We are committed to making our content accessible to all users. 
+              If you encounter any accessibility barriers on our site, please let us know.
             </p>
           </div>
         </div>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Send Us a Message</CardTitle>
+            <CardDescription>
+              Fill out the form below and we'll get back to you as soon as possible.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Name</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Your name" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email</FormLabel>
+                      <FormControl>
+                        <Input placeholder="your.email@example.com" type="email" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={form.control}
+                  name="subject"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Subject</FormLabel>
+                      <FormControl>
+                        <Input placeholder="How can we help you?" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={form.control}
+                  name="message"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Message</FormLabel>
+                      <FormControl>
+                        <Textarea 
+                          placeholder="Please describe your inquiry in detail..."
+                          className="min-h-[120px]"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                      <FormDescription>
+                        Include any specific details that might help us assist you better.
+                      </FormDescription>
+                    </FormItem>
+                  )}
+                />
+                
+                <Button type="submit" className="w-full" disabled={isSubmitting}>
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Sending...
+                    </>
+                  ) : (
+                    "Send Message"
+                  )}
+                </Button>
+              </form>
+            </Form>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

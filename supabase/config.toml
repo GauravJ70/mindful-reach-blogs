@@ -1,6 +1,27 @@
 
 project_id = "haavjhxxptnrlrtmdqub"
+[api]
+enabled = true
+url = "https://haavjhxxptnrlrtmdqub.supabase.co"
+service_role_key = "add your service role key"
 
+[db]
+shadow_database_schema = "shadow"
+
+[auth]
+enabled = true
+user_value_enabled = true
+
+[storage]
+enabled = true
+
+[analytics]
+enabled = false
+backend = "postgres"
+
+[experimental]
+postgres_changes_webhook = true
+
+[functions]
 [functions.send-contact-email]
 verify_jwt = false
-

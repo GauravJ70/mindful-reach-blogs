@@ -1,18 +1,49 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import BlogCard from "@/components/blog/BlogCard";
-import { blogPosts } from "@/data/blogPosts";
-import { Search } from "lucide-react";
+import BlogCard, { BlogPost } from "@/components/blog/BlogCard";
+import { Search, Loader2 } from "lucide-react";
+import { useSearchParams } from "react-router-dom";
+import { fetchPosts } from "@/services/blogService";
+import { useToast } from "@/components/ui/use-toast";
 
 const BlogPage = () => {
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const initialSearch = searchParams.get("search") || "";
+  const [searchQuery, setSearchQuery] = useState(initialSearch);
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
+  const [allTags, setAllTags] = useState<string[]>([]);
+  const { toast } = useToast();
 
-  // Extract all unique tags
-  const allTags = [...new Set(blogPosts.flatMap((post) => post.tags))];
+  // Fetch posts from Supabase
+  useEffect(() => {
+    const getPosts = async () => {
+      try {
+        setIsLoading(true);
+        const posts = await fetchPosts();
+        setBlogPosts(posts);
+
+        // Extract all unique tags
+        const tags = [...new Set(posts.flatMap((post) => post.tags))];
+        setAllTags(tags);
+      } catch (error: any) {
+        console.error("Error fetching posts:", error);
+        toast({
+          title: "Error loading posts",
+          description: error.message || "Failed to load blog posts",
+          variant: "destructive",
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    getPosts();
+  }, [toast]);
 
   // Filter posts based on search and selected tag
   const filteredPosts = blogPosts.filter((post) => {
@@ -27,7 +58,7 @@ const BlogPage = () => {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    // The filtering is already happening reactively via the state
+    setSearchParams(searchQuery ? { search: searchQuery } : {});
   };
 
   const toggleTag = (tag: string) => {
@@ -40,7 +71,7 @@ const BlogPage = () => {
 
   return (
     <div>
-      <h1 className="text-4xl font-bold mb-6">Blog</h1>
+      <h1 className="text-4xl font-bold mb-6">Accessibility Blog</h1>
       
       <div className="mb-8">
         <form 
@@ -96,7 +127,11 @@ const BlogPage = () => {
         </div>
       </div>
 
-      {filteredPosts.length > 0 ? (
+      {isLoading ? (
+        <div className="flex justify-center items-center py-12">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      ) : filteredPosts.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredPosts.map((post) => (
             <BlogCard key={post.id} post={post} />
@@ -108,7 +143,7 @@ const BlogPage = () => {
           <p className="text-muted-foreground mb-6">
             Try adjusting your search or filter to find what you're looking for.
           </p>
-          <Button onClick={() => { setSearchQuery(""); setSelectedTag(null); }}>
+          <Button onClick={() => { setSearchQuery(""); setSelectedTag(null); setSearchParams({}); }}>
             Clear All Filters
           </Button>
         </div>
