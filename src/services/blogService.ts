@@ -38,7 +38,7 @@ export async function fetchPosts(): Promise<BlogPost[]> {
   
   const posts = data.map(post => {
     // Use optional chaining and nullish coalescing to safely access potentially undefined properties
-    const profileName = typeof post.profiles === 'object' && post.profiles !== null 
+    const profileName = post.profiles && typeof post.profiles === 'object' 
       ? post.profiles.name 
       : null;
       
@@ -82,7 +82,7 @@ export async function fetchPostById(id: string): Promise<BlogPostDetails | null>
   }
 
   // Use optional chaining and nullish coalescing to safely access potentially undefined properties
-  const profileName = typeof data.profiles === 'object' && data.profiles !== null 
+  const profileName = data.profiles && typeof data.profiles === 'object'
     ? data.profiles.name 
     : null;
   

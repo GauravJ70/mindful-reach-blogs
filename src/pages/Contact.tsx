@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,7 +9,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useToast } from "@/components/ui/use-toast";
 import { Loader2 } from "lucide-react";
-import { submitContactForm } from "@/services/contactService";
+import { submitContactForm, ContactSubmission } from "@/services/contactService";
 
 // This schema should match the ContactSubmission interface in contactService.ts
 const contactSchema = z.object({
@@ -39,6 +38,7 @@ const ContactPage = () => {
   const onSubmit = async (data: ContactFormValues) => {
     try {
       setIsSubmitting(true);
+      // Now data fully matches the ContactSubmission interface
       await submitContactForm(data);
       form.reset();
       toast({
