@@ -1,5 +1,5 @@
 
-import React from "react";
+import * as React from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -31,53 +31,55 @@ const queryClient = new QueryClient({
 });
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <ThemeProvider>
-      <TooltipProvider>
-        <AuthProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<Layout />}>
-                <Route index element={<HomePage />} />
-                <Route path="blog" element={<BlogPage />} />
-                <Route path="blog/:id" element={<BlogPostPage />} />
-                <Route path="about" element={<AboutPage />} />
-                <Route path="contact" element={<ContactPage />} />
-                <Route path="author" element={<AuthorPage />} />
-                <Route path="auth" element={<AuthPage />} />
-                
-                {/* Protected routes */}
-                <Route path="blog/create" element={
-                  <ProtectedRoute>
-                    <CreatePostPage />
-                  </ProtectedRoute>
-                } />
-                <Route path="blog/edit/:id" element={
-                  <ProtectedRoute>
-                    <CreatePostPage />
-                  </ProtectedRoute>
-                } />
-                <Route path="profile" element={
-                  <ProtectedRoute>
-                    <UserProfilePage />
-                  </ProtectedRoute>
-                } />
-                <Route path="admin" element={
-                  <ProtectedRoute adminOnly>
-                    <AdminDashboardPage />
-                  </ProtectedRoute>
-                } />
-                
-                <Route path="*" element={<NotFound />} />
-              </Route>
-            </Routes>
-          </BrowserRouter>
-        </AuthProvider>
-      </TooltipProvider>
-    </ThemeProvider>
-  </QueryClientProvider>
+  <React.StrictMode>
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider>
+        <TooltipProvider>
+          <AuthProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <Routes>
+                <Route path="/" element={<Layout />}>
+                  <Route index element={<HomePage />} />
+                  <Route path="blog" element={<BlogPage />} />
+                  <Route path="blog/:id" element={<BlogPostPage />} />
+                  <Route path="about" element={<AboutPage />} />
+                  <Route path="contact" element={<ContactPage />} />
+                  <Route path="author" element={<AuthorPage />} />
+                  <Route path="auth" element={<AuthPage />} />
+                  
+                  {/* Protected routes */}
+                  <Route path="blog/create" element={
+                    <ProtectedRoute>
+                      <CreatePostPage />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="blog/edit/:id" element={
+                    <ProtectedRoute>
+                      <CreatePostPage />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="profile" element={
+                    <ProtectedRoute>
+                      <UserProfilePage />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="admin" element={
+                    <ProtectedRoute adminOnly>
+                      <AdminDashboardPage />
+                    </ProtectedRoute>
+                  } />
+                  
+                  <Route path="*" element={<NotFound />} />
+                </Route>
+              </Routes>
+            </BrowserRouter>
+          </AuthProvider>
+        </TooltipProvider>
+      </ThemeProvider>
+    </QueryClientProvider>
+  </React.StrictMode>
 );
 
 export default App;

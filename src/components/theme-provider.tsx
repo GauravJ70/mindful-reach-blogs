@@ -1,5 +1,5 @@
 
-import { createContext, useContext, useEffect, useState } from "react";
+import * as React from "react";
 
 type Theme = "dark" | "light" | "system";
 
@@ -27,7 +27,7 @@ const initialState: ThemeProviderState = {
   setLargeText: () => null,
 };
 
-const ThemeProviderContext = createContext<ThemeProviderState>(initialState);
+const ThemeProviderContext = React.createContext<ThemeProviderState>(initialState);
 
 export function ThemeProvider({
   children,
@@ -35,21 +35,21 @@ export function ThemeProvider({
   storageKey = "vite-ui-theme",
   ...props
 }: ThemeProviderProps) {
-  const [theme, setTheme] = useState<Theme>(
+  const [theme, setTheme] = React.useState<Theme>(
     () => (localStorage.getItem(storageKey) as Theme) || defaultTheme
   );
 
-  const [highContrast, setHighContrast] = useState(() => {
+  const [highContrast, setHighContrast] = React.useState(() => {
     const saved = localStorage.getItem("high-contrast");
     return saved === "true";
   });
 
-  const [largeText, setLargeText] = useState(() => {
+  const [largeText, setLargeText] = React.useState(() => {
     const saved = localStorage.getItem("large-text");
     return saved === "true";
   });
 
-  useEffect(() => {
+  React.useEffect(() => {
     const root = window.document.documentElement;
 
     root.classList.remove("light", "dark");
@@ -67,7 +67,7 @@ export function ThemeProvider({
     root.classList.add(theme);
   }, [theme]);
 
-  useEffect(() => {
+  React.useEffect(() => {
     const root = window.document.documentElement;
     if (highContrast) {
       root.classList.add("high-contrast");
@@ -77,7 +77,7 @@ export function ThemeProvider({
     localStorage.setItem("high-contrast", highContrast.toString());
   }, [highContrast]);
 
-  useEffect(() => {
+  React.useEffect(() => {
     const root = window.document.documentElement;
     if (largeText) {
       root.classList.add("large-text");
@@ -107,7 +107,7 @@ export function ThemeProvider({
 }
 
 export const useTheme = () => {
-  const context = useContext(ThemeProviderContext);
+  const context = React.useContext(ThemeProviderContext);
 
   if (context === undefined)
     throw new Error("useTheme must be used within a ThemeProvider");
