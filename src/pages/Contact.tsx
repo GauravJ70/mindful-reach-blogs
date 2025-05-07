@@ -12,6 +12,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { Loader2 } from "lucide-react";
 import { submitContactForm } from "@/services/contactService";
 
+// This schema should match the ContactSubmission interface in contactService.ts
 const contactSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters" }),
   email: z.string().email({ message: "Please enter a valid email address" }),

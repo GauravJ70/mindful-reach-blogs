@@ -37,13 +37,18 @@ export async function fetchPosts(): Promise<BlogPost[]> {
   }
   
   const posts = data.map(post => {
+    // Use optional chaining and nullish coalescing to safely access potentially undefined properties
+    const profileName = typeof post.profiles === 'object' && post.profiles !== null 
+      ? post.profiles.name 
+      : null;
+      
     return {
       id: post.id,
       title: post.title,
       summary: post.content.substring(0, 150) + "...",
       date: post.published_at,
       imageUrl: post.cover_image_url || "https://images.unsplash.com/photo-1499750310107-5fef28a66643",
-      author: post.profiles?.name || post.author || "Unknown Author",
+      author: profileName || post.author || "Unknown Author",
       authorId: post.author,
       tags: post.tags || []
     };
@@ -75,6 +80,11 @@ export async function fetchPostById(id: string): Promise<BlogPostDetails | null>
     }
     throw new Error("Failed to fetch blog post");
   }
+
+  // Use optional chaining and nullish coalescing to safely access potentially undefined properties
+  const profileName = typeof data.profiles === 'object' && data.profiles !== null 
+    ? data.profiles.name 
+    : null;
   
   return {
     id: data.id,
@@ -83,7 +93,7 @@ export async function fetchPostById(id: string): Promise<BlogPostDetails | null>
     summary: data.content.substring(0, 150) + "...",
     date: data.published_at,
     imageUrl: data.cover_image_url || "https://images.unsplash.com/photo-1499750310107-5fef28a66643",
-    author: data.profiles?.name || data.author || "Unknown Author",
+    author: profileName || data.author || "Unknown Author",
     authorId: data.author,
     tags: data.tags || []
   };
