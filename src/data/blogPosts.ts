@@ -10,6 +10,7 @@ export const blogPosts: BlogPost[] = [
     date: "2025-04-25",
     imageUrl: "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b",
     author: "Gaurav Jadhav",
+    authorId: "demo-author-id", // Added missing authorId
     tags: ["Accessibility", "Web Development", "WCAG", "Inclusive Design"]
   },
   {
@@ -19,6 +20,7 @@ export const blogPosts: BlogPost[] = [
     date: "2025-04-18",
     imageUrl: "https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7",
     author: "Gaurav Jadhav",
+    authorId: "demo-author-id", // Added missing authorId
     tags: ["WCAG", "Compliance", "Accessibility", "Standards"]
   },
   {
@@ -28,6 +30,7 @@ export const blogPosts: BlogPost[] = [
     date: "2025-04-10",
     imageUrl: "https://images.unsplash.com/photo-1605810230434-7631ac76ec81",
     author: "Gaurav Jadhav",
+    authorId: "demo-author-id", // Added missing authorId
     tags: ["Screen Readers", "Accessibility", "Assistive Technology"]
   },
   {
@@ -37,6 +40,7 @@ export const blogPosts: BlogPost[] = [
     date: "2025-04-02",
     imageUrl: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158",
     author: "Gaurav Jadhav",
+    authorId: "demo-author-id", // Added missing authorId
     tags: ["Color Contrast", "Visual Impairment", "Accessibility", "Design"]
   },
   {
@@ -46,6 +50,7 @@ export const blogPosts: BlogPost[] = [
     date: "2025-03-27",
     imageUrl: "https://images.unsplash.com/photo-1498050108023-c5249f4df085",
     author: "Gaurav Jadhav", 
+    authorId: "demo-author-id", // Added missing authorId
     tags: ["Keyboard Navigation", "Accessibility", "Web Development"]
   },
   {
@@ -55,6 +60,7 @@ export const blogPosts: BlogPost[] = [
     date: "2025-03-20",
     imageUrl: "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d",
     author: "Gaurav Jadhav",
+    authorId: "demo-author-id", // Added missing authorId
     tags: ["Forms", "User Input", "Accessibility", "UX Design"]
   },
   {
@@ -64,6 +70,7 @@ export const blogPosts: BlogPost[] = [
     date: "2025-03-15",
     imageUrl: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5",
     author: "Gaurav Jadhav",
+    authorId: "demo-author-id", // Added missing authorId
     tags: ["Testing", "Tools", "Accessibility", "QA"]
   },
   {
@@ -73,6 +80,7 @@ export const blogPosts: BlogPost[] = [
     date: "2025-03-08",
     imageUrl: "https://images.unsplash.com/photo-1649972904349-6e44c42644a7",
     author: "Gaurav Jadhav",
+    authorId: "demo-author-id", // Added missing authorId
     tags: ["Inclusive Design", "UX", "Accessibility", "Design Thinking"]
   }
 ];

@@ -22,6 +22,11 @@ serve(async (req) => {
   try {
     const { name, email, subject, message }: ContactEmailRequest = await req.json();
 
+    // Validate required fields
+    if (!name || !email || !subject || !message) {
+      throw new Error("Missing required fields");
+    }
+
     // For now, let's log the data since we don't have email setup yet
     console.log("Contact form submission:", { name, email, subject, message });
 
