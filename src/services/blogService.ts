@@ -16,7 +16,7 @@ export async function fetchPosts(): Promise<BlogPost[]> {
       cover_image_url,
       published_at,
       tags,
-      profiles(name)
+      author
     `)
     .order("published_at", { ascending: false });
   
@@ -25,15 +25,26 @@ export async function fetchPosts(): Promise<BlogPost[]> {
     throw new Error("Failed to fetch blog posts");
   }
   
-  return data.map((post): BlogPost => ({
-    id: post.id,
-    title: post.title,
-    summary: post.content.substring(0, 150) + "...",
-    date: post.published_at,
-    imageUrl: post.cover_image_url || "https://images.unsplash.com/photo-1499750310107-5fef28a66643",
-    author: post.profiles?.name || "Unknown Author",
-    tags: post.tags || []
+  // We need to fetch author names separately since we have a join issue
+  const posts = await Promise.all(data.map(async (post) => {
+    const { data: authorData } = await supabase
+      .from("profiles")
+      .select("name")
+      .eq("id", post.author)
+      .single();
+    
+    return {
+      id: post.id,
+      title: post.title,
+      summary: post.content.substring(0, 150) + "...",
+      date: post.published_at,
+      imageUrl: post.cover_image_url || "https://images.unsplash.com/photo-1499750310107-5fef28a66643",
+      author: authorData?.name || "Unknown Author",
+      tags: post.tags || []
+    };
   }));
+  
+  return posts;
 }
 
 export async function fetchPostById(id: string): Promise<BlogPostDetails | null> {
@@ -46,7 +57,7 @@ export async function fetchPostById(id: string): Promise<BlogPostDetails | null>
       cover_image_url,
       published_at,
       tags,
-      profiles(name)
+      author
     `)
     .eq("id", id)
     .single();
@@ -59,6 +70,13 @@ export async function fetchPostById(id: string): Promise<BlogPostDetails | null>
     throw new Error("Failed to fetch blog post");
   }
   
+  // Fetch author name separately
+  const { data: authorData } = await supabase
+    .from("profiles")
+    .select("name")
+    .eq("id", data.author)
+    .single();
+  
   return {
     id: data.id,
     title: data.title,
@@ -66,7 +84,7 @@ export async function fetchPostById(id: string): Promise<BlogPostDetails | null>
     summary: data.content.substring(0, 150) + "...",
     date: data.published_at,
     imageUrl: data.cover_image_url || "https://images.unsplash.com/photo-1499750310107-5fef28a66643",
-    author: data.profiles?.name || "Unknown Author",
+    author: authorData?.name || "Unknown Author",
     tags: data.tags || []
   };
 }
@@ -77,9 +95,19 @@ export async function createPost(post: {
   cover_image_url?: string;
   tags?: string[];
 }): Promise<string> {
+  // Need to include the author field from the authenticated user
+  const { data: sessionData } = await supabase.auth.getSession();
+  
+  if (!sessionData.session?.user) {
+    throw new Error("User must be authenticated to create a post");
+  }
+  
   const { data, error } = await supabase
     .from("posts")
-    .insert([post])
+    .insert({
+      ...post,
+      author: sessionData.session.user.id,
+    })
     .select();
   
   if (error) {
