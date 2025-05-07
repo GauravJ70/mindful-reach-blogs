@@ -26,8 +26,7 @@ export async function fetchPosts(): Promise<BlogPost[]> {
       cover_image_url,
       published_at,
       tags,
-      author,
-      profiles(name)
+      author
     `)
     .order("published_at", { ascending: false });
   
@@ -37,22 +36,13 @@ export async function fetchPosts(): Promise<BlogPost[]> {
   }
   
   const posts = data.map(post => {
-    // Extract profile name safely
-    let profileName = null;
-    if (post.profiles) {
-      const profiles = post.profiles as { name?: string } | null;
-      if (profiles && typeof profiles === 'object') {
-        profileName = profiles.name;
-      }
-    }
-      
     return {
       id: post.id,
       title: post.title,
       summary: post.content.substring(0, 150) + "...",
       date: post.published_at,
       imageUrl: post.cover_image_url || "https://images.unsplash.com/photo-1499750310107-5fef28a66643",
-      author: profileName || post.author || "Unknown Author",
+      author: post.author || "Unknown Author",
       authorId: post.author,
       tags: post.tags || []
     };
@@ -71,8 +61,7 @@ export async function fetchPostById(id: string): Promise<BlogPostDetails | null>
       cover_image_url,
       published_at,
       tags,
-      author,
-      profiles(name)
+      author
     `)
     .eq("id", id)
     .single();
@@ -84,15 +73,6 @@ export async function fetchPostById(id: string): Promise<BlogPostDetails | null>
     }
     throw new Error("Failed to fetch blog post");
   }
-
-  // Extract profile name safely
-  let profileName = null;
-  if (data.profiles) {
-    const profiles = data.profiles as { name?: string } | null;
-    if (profiles && typeof profiles === 'object') {
-      profileName = profiles.name;
-    }
-  }
   
   return {
     id: data.id,
@@ -101,7 +81,7 @@ export async function fetchPostById(id: string): Promise<BlogPostDetails | null>
     summary: data.content.substring(0, 150) + "...",
     date: data.published_at,
     imageUrl: data.cover_image_url || "https://images.unsplash.com/photo-1499750310107-5fef28a66643",
-    author: profileName || data.author || "Unknown Author",
+    author: data.author || "Unknown Author",
     authorId: data.author,
     tags: data.tags || []
   };
