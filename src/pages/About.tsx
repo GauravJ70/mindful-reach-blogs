@@ -9,24 +9,17 @@ const AboutPage = () => {
       
       <section className="mb-10">
         <div className="aspect-video rounded-lg overflow-hidden mb-8">
-          <video 
+          <iframe 
             className="w-full h-full object-cover" 
-            controls 
-            poster="https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=1200"
-            aria-label="Video showcasing our commitment to accessibility"
-          >
-            <source src="https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" type="video/mp4" />
-            <track 
-              kind="captions" 
-              src="/captions/about-video.vtt" 
-              srcLang="en" 
-              label="English" 
-              default 
-            />
-            Your browser does not support the video tag.
-          </video>
+            src="https://www.youtube.com/embed/8Rn5pXCdZWU" 
+            title="How People with Disabilities Use the Web" 
+            frameBorder="0" 
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+            allowFullScreen
+            aria-label="Video showcasing how people with disabilities use the web"
+          ></iframe>
           <p className="text-sm text-muted-foreground mt-2">
-            Captions available - use the CC button in the video player. A full transcript is available below the video.
+            This video demonstrates how people with various disabilities navigate and use the web with assistive technologies.
           </p>
         </div>
 
@@ -36,13 +29,16 @@ const AboutPage = () => {
           </summary>
           <div className="mt-3 p-4 bg-muted rounded-md text-sm">
             <p className="mb-2">
-              [Narrator] At MindfulReach, we believe that digital content should be accessible to everyone.
+              [Narrator] In this video, we see how people with different disabilities use the web.
             </p>
             <p className="mb-2">
-              Our platform is designed with accessibility as a core principle, not an afterthought.
+              Screen reader users navigate using keyboard shortcuts and listen to the content being read aloud.
+            </p>
+            <p className="mb-2">
+              People with motor disabilities may use specialized devices like mouth sticks, eye tracking, or adaptive keyboards.
             </p>
             <p>
-              Join us in creating a more inclusive digital world where information and knowledge are truly available to all.
+              At MindfulReach, we design our platform to ensure everyone has equal access to information regardless of their abilities.
             </p>
           </div>
         </details>
@@ -94,7 +90,7 @@ const AboutPage = () => {
         <div className="md:flex gap-6 items-start mb-6">
           <div className="md:w-1/3 mb-4 md:mb-0">
             <img 
-              src="https://images.unsplash.com/photo-1629907710657-e28189e4e32a?q=80&w=600" 
+              src="https://images.unsplash.com/photo-1555617171-a072c97e09a7?q=80&w=600" 
               alt="Close-up of hands using a specialized accessibility keyboard with large keys" 
               className="rounded-lg w-full h-auto"
             />
@@ -128,7 +124,7 @@ const AboutPage = () => {
         <div className="md:flex gap-6 items-center my-8">
           <div className="md:w-1/2 mb-4 md:mb-0">
             <img 
-              src="https://images.unsplash.com/photo-1606166145177-8465c1ee8d3b?q=80&w=800" 
+              src="https://images.unsplash.com/photo-1516239482140-b50fb7d819c7?q=80&w=800" 
               alt="Person using a screen reader device connected to a laptop computer" 
               className="rounded-lg w-full h-auto"
             />

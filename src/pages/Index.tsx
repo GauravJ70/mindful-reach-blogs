@@ -32,7 +32,7 @@ const HomePage = () => {
           
           <div className="relative aspect-[21/9] rounded-xl overflow-hidden mb-8">
             <img 
-              src="https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?q=80&w=2000" 
+              src="https://images.unsplash.com/photo-1516239482140-b50fb7d819c7?q=80&w=2000" 
               alt="A diverse group of people collaboratively working with digital content, including a person using a screen reader and another using a specialized keyboard" 
               className="w-full h-full object-cover"
             />
@@ -80,7 +80,7 @@ const HomePage = () => {
             <div className="bg-background p-6 rounded-lg shadow-sm">
               <Accessibility className="h-10 w-10 mx-auto mb-4 text-primary" />
               <p className="text-3xl font-bold text-primary mb-2">25,000+</p>
-              <p>People helped through our accessible content</p>
+              <p>People with disabilities helped through our accessible content</p>
             </div>
             
             <div className="bg-background p-6 rounded-lg shadow-sm">
@@ -135,8 +135,8 @@ const HomePage = () => {
           <div className="md:w-1/3 mb-6 md:mb-0">
             <div className="rounded-lg overflow-hidden">
               <img 
-                src="https://images.unsplash.com/photo-1530811761207-8d9d22f0a141?q=80&w=800" 
-                alt="A person using a braille display connected to a laptop" 
+                src="https://images.unsplash.com/photo-1555617171-a072c97e09a7?q=80&w=800" 
+                alt="A person using a specialized keyboard to navigate a website" 
                 className="w-full h-auto"
               />
             </div>
