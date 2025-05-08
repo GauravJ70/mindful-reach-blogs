@@ -58,6 +58,37 @@ const AboutPage = () => {
         </div>
       </section>
 
+      {/* New Impact Statistics Section */}
+      <section className="mb-10 bg-muted p-8 rounded-lg">
+        <h2 className="text-2xl font-bold mb-6 text-center">Our Impact</h2>
+        
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+          <div className="bg-background p-6 rounded-lg shadow-sm">
+            <p className="text-4xl font-bold text-primary mb-2">25,000+</p>
+            <p className="text-lg">Users Reached</p>
+          </div>
+          
+          <div className="bg-background p-6 rounded-lg shadow-sm">
+            <p className="text-4xl font-bold text-primary mb-2">120+</p>
+            <p className="text-lg">Websites Improved</p>
+          </div>
+          
+          <div className="bg-background p-6 rounded-lg shadow-sm">
+            <p className="text-4xl font-bold text-primary mb-2">98%</p>
+            <p className="text-lg">User Satisfaction</p>
+          </div>
+        </div>
+        
+        <div className="mt-8 prose max-w-none">
+          <p>
+            Since our founding in 2023, MindfulReach has been committed to making the web more accessible. Our platform has helped over 25,000 users access digital content that would otherwise be inaccessible to them. Through our consulting services, we've helped improve more than 120 websites to meet WCAG standards.
+          </p>
+          <p>
+            Our community of accessibility advocates continues to grow, with regular workshops and training sessions that have educated hundreds of developers and designers on inclusive design principles.
+          </p>
+        </div>
+      </section>
+
       <section className="mb-10" id="accessibility">
         <h2 className="text-2xl font-bold mb-4">Accessibility Statement</h2>
         <div className="md:flex gap-6 items-start mb-6">

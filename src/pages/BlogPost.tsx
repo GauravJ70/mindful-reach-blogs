@@ -110,6 +110,61 @@ const BlogPostPage = () => {
 
       <div className="prose prose-lg max-w-none mb-12">
         <div dangerouslySetInnerHTML={{ __html: post.content }} />
+        
+        {/* Add video section for all accessibility-related posts */}
+        {post.tags.includes("Accessibility") && (
+          <div className="my-8 rounded-lg overflow-hidden">
+            <h2 className="text-2xl font-bold mb-4">How People with Disabilities Use the Web</h2>
+            <div className="aspect-video mb-4">
+              <video 
+                controls 
+                className="w-full h-full object-cover rounded-lg"
+                poster="https://images.unsplash.com/photo-1559087867-ce4f9c2b3f51?q=80&w=2000"
+              >
+                <source src="https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4" type="video/mp4" />
+                <track 
+                  kind="captions" 
+                  src="/captions/about-video.vtt" 
+                  srcLang="en" 
+                  label="English" 
+                />
+                Your browser does not support the video tag.
+              </video>
+            </div>
+            <p className="text-sm text-muted-foreground mb-6">
+              This video demonstrates how people with various disabilities navigate and use the web with assistive technologies.
+            </p>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 my-8">
+              <div>
+                <img 
+                  src="https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?q=80&w=2000" 
+                  alt="Person using a screen reader with headphones to navigate a website" 
+                  className="rounded-lg w-full h-auto mb-2"
+                />
+                <p className="text-sm text-muted-foreground">Screen reader users rely on well-structured content with proper headings and alt text.</p>
+              </div>
+              <div>
+                <img 
+                  src="https://images.unsplash.com/photo-1629907710657-e28189e4e32a?q=80&w=2000" 
+                  alt="Close-up of hands using an adaptive keyboard with enlarged keys" 
+                  className="rounded-lg w-full h-auto mb-2"
+                />
+                <p className="text-sm text-muted-foreground">Specialized input devices help people with motor disabilities interact with websites.</p>
+              </div>
+            </div>
+            
+            <div className="bg-muted p-6 rounded-lg my-8">
+              <h3 className="text-xl font-bold mb-3">Impact Statistics</h3>
+              <ul className="list-disc pl-6 space-y-2">
+                <li>Over 1 billion people worldwide live with some form of disability</li>
+                <li>15% of the world's population experiences disability in some form</li>
+                <li>71% of users with disabilities will leave a website that is not accessible</li>
+                <li>MindfulReach has helped over 25,000 users access content through accessible design</li>
+              </ul>
+            </div>
+          </div>
+        )}
       </div>
       
       <Separator className="my-8" />

@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import BlogCard from "@/components/blog/BlogCard";
-import { Search } from "lucide-react";
+import { Search, User, Eye, Accessibility } from "lucide-react";
 import { useState } from "react";
 import { blogPosts } from "@/data/blogPosts";
 
@@ -67,6 +67,33 @@ const HomePage = () => {
                 <Search className="h-5 w-5" />
               </Button>
             </form>
+          </div>
+        </div>
+      </section>
+
+      {/* Impact statistics section */}
+      <section className="py-8 bg-muted rounded-lg mb-12">
+        <div className="max-w-6xl mx-auto px-4">
+          <h2 className="text-2xl font-bold mb-6 text-center">Making the Web Better for Everyone</h2>
+          
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 text-center">
+            <div className="bg-background p-6 rounded-lg shadow-sm">
+              <Accessibility className="h-10 w-10 mx-auto mb-4 text-primary" />
+              <p className="text-3xl font-bold text-primary mb-2">25,000+</p>
+              <p>People helped through our accessible content</p>
+            </div>
+            
+            <div className="bg-background p-6 rounded-lg shadow-sm">
+              <User className="h-10 w-10 mx-auto mb-4 text-primary" />
+              <p className="text-3xl font-bold text-primary mb-2">15%</p>
+              <p>Of the world's population lives with a disability</p>
+            </div>
+            
+            <div className="bg-background p-6 rounded-lg shadow-sm">
+              <Eye className="h-10 w-10 mx-auto mb-4 text-primary" />
+              <p className="text-3xl font-bold text-primary mb-2">98%</p>
+              <p>User satisfaction with our accessible content</p>
+            </div>
           </div>
         </div>
       </section>
