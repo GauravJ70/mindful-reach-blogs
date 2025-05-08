@@ -2,11 +2,10 @@
 import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import BlogCard, { BlogPost } from "@/components/blog/BlogCard";
+import BlogCard from "@/components/blog/BlogCard";
 import { Search, Loader2 } from "lucide-react";
 import { useSearchParams } from "react-router-dom";
-import { fetchPosts } from "@/services/blogService";
+import { fetchPosts, BlogPost } from "@/services/blogService";
 import { useToast } from "@/components/ui/use-toast";
 
 const BlogPage = () => {
@@ -20,7 +19,7 @@ const BlogPage = () => {
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
 
-  // Fetch posts from Supabase
+  // Fetch posts from static data
   useEffect(() => {
     const getPosts = async () => {
       try {

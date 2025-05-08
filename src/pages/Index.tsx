@@ -3,51 +3,17 @@ import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import BlogCard from "@/components/blog/BlogCard";
-import { blogPosts } from "@/data/blogPosts";
 import { Search } from "lucide-react";
-import { useEffect, useState } from "react";
-import { fetchPosts, BlogPost } from "@/services/blogService";
-import { useToast } from "@/components/ui/use-toast";
+import { useState } from "react";
+import { blogPosts } from "@/data/blogPosts";
 
 const HomePage = () => {
-  const [featuredPosts, setFeaturedPosts] = useState<BlogPost[]>([]);
-  const [recentPosts, setRecentPosts] = useState<BlogPost[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const { toast } = useToast();
-
-  useEffect(() => {
-    const loadPosts = async () => {
-      try {
-        setIsLoading(true);
-        const allPosts = await fetchPosts();
-        
-        if (allPosts.length > 0) {
-          setFeaturedPosts(allPosts.slice(0, 1));
-          setRecentPosts(allPosts.slice(1, 7));
-        } else {
-          // Fallback to static data if no posts are returned
-          setFeaturedPosts(blogPosts.slice(0, 1));
-          setRecentPosts(blogPosts.slice(1, 7));
-        }
-      } catch (error) {
-        console.error("Error loading posts:", error);
-        // Fallback to static data on error
-        setFeaturedPosts(blogPosts.slice(0, 1));
-        setRecentPosts(blogPosts.slice(1, 7));
-        
-        toast({
-          title: "Error loading posts",
-          description: "Using sample data instead. Please try again later.",
-          variant: "destructive",
-        });
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadPosts();
-  }, [toast]);
+  
+  // Static blog posts for featured and recent sections
+  const featuredPosts = blogPosts.slice(0, 1);
+  const recentPosts = blogPosts.slice(1, 7);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();

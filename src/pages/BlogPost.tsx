@@ -3,35 +3,18 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { CalendarIcon, ArrowLeft, User, Edit, Trash2 } from "lucide-react";
+import { CalendarIcon, ArrowLeft, User } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import FeedbackForm from "@/components/blog/FeedbackForm";
-import { fetchPostById, BlogPostDetails, deletePost } from "@/services/blogService";
+import { fetchPostById, BlogPostDetails } from "@/services/blogService";
 import { useToast } from "@/components/ui/use-toast";
-import { useAuth } from "@/context/AuthContext";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
 
 const BlogPostPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { user } = useAuth();
   const [post, setPost] = useState<BlogPostDetails | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [isDeleting, setIsDeleting] = useState(false);
-  
-  // Check if the current user is the author of the post
-  const isAuthor = user && post?.authorId === user.id;
   
   useEffect(() => {
     // Scroll to top when post changes
@@ -58,29 +41,6 @@ const BlogPostPage = () => {
     
     getPost();
   }, [id, toast]);
-
-  const handleDelete = async () => {
-    if (!id) return;
-    
-    try {
-      setIsDeleting(true);
-      await deletePost(id);
-      toast({
-        title: "Post deleted",
-        description: "The blog post has been successfully deleted.",
-      });
-      navigate("/blog");
-    } catch (error: any) {
-      console.error("Error deleting post:", error);
-      toast({
-        title: "Error deleting post",
-        description: error.message || "Failed to delete blog post",
-        variant: "destructive",
-      });
-    } finally {
-      setIsDeleting(false);
-    }
-  };
 
   if (isLoading) {
     return (
@@ -127,50 +87,6 @@ const BlogPostPage = () => {
             <User className="h-4 w-4 mr-1" aria-hidden="true" />
             <span>{post.author}</span>
           </div>
-          
-          {isAuthor && (
-            <div className="ml-auto flex gap-2">
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={() => navigate(`/blog/edit/${post.id}`)}
-              >
-                <Edit className="h-4 w-4 mr-1" />
-                Edit
-              </Button>
-              
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button 
-                    variant="destructive" 
-                    size="sm"
-                  >
-                    <Trash2 className="h-4 w-4 mr-1" />
-                    Delete
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      This action cannot be undone. This will permanently delete your blog post
-                      and remove it from our servers.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction
-                      onClick={handleDelete}
-                      disabled={isDeleting}
-                      className="bg-destructive text-destructive-foreground"
-                    >
-                      {isDeleting ? "Deleting..." : "Delete"}
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-            </div>
-          )}
         </div>
         
         <div className="flex flex-wrap gap-2 mb-6">
