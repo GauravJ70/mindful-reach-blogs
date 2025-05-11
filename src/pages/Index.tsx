@@ -1,3 +1,4 @@
+
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -33,7 +34,7 @@ const HomePage = () => {
           <div className="relative rounded-xl overflow-hidden mb-8">
             <AspectRatio ratio={21/9}>
               <img 
-                src="https://images.unsplash.com/photo-1516239482140-b50fb7d819c7?q=80&w=2000" 
+                src="https://images.unsplash.com/photo-1605810230434-7631ac76ec81?q=80&w=2000" 
                 alt="A diverse group of people collaboratively working with digital content, including a person using a screen reader and another using a specialized keyboard" 
                 className="w-full h-full object-cover"
               />
