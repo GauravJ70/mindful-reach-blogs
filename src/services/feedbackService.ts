@@ -30,7 +30,7 @@ export async function submitFeedback(feedback: FeedbackSubmission): Promise<void
 }
 
 async function sendFeedbackNotification(feedback: FeedbackSubmission): Promise<void> {
-  const webhookUrl = "https://hooks.zapier.com/hooks/catch/123456/abcdef/"; // Replace with your actual Zapier webhook URL
+  const webhookUrl = "https://hooks.zapier.com/hooks/catch/22884362/2ncd0om/"; // Updated with the provided Zapier webhook URL
   
   try {
     await fetch(webhookUrl, {
