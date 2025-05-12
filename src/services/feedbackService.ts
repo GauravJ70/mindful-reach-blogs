@@ -10,22 +10,31 @@ export interface FeedbackSubmission {
 }
 
 export async function submitFeedback(feedback: FeedbackSubmission): Promise<void> {
-  const { error } = await supabase
-    .from("feedback")
-    .insert([feedback]);
+  console.log("Submitting feedback:", feedback);
   
-  if (error) {
-    console.error("Error submitting feedback:", error);
-    throw new Error("Failed to submit feedback");
-  }
-
-  // Send notification via webhook
   try {
-    await sendFeedbackNotification(feedback);
-  } catch (notificationError) {
-    console.error("Error sending feedback notification:", notificationError);
-    // We don't throw here to avoid affecting the user experience
-    // The feedback is saved in the database even if notification fails
+    const { error } = await supabase
+      .from("feedback")
+      .insert([feedback]);
+    
+    if (error) {
+      console.error("Error submitting feedback to database:", error);
+      throw new Error("Failed to submit feedback: " + error.message);
+    }
+
+    console.log("Feedback successfully saved to database");
+
+    // Send notification via webhook
+    try {
+      await sendFeedbackNotification(feedback);
+    } catch (notificationError) {
+      console.error("Error sending feedback notification:", notificationError);
+      // We don't throw here to avoid affecting the user experience
+      // The feedback is saved in the database even if notification fails
+    }
+  } catch (error: any) {
+    console.error("Error in submitFeedback function:", error);
+    throw error;
   }
 }
 
@@ -33,6 +42,8 @@ async function sendFeedbackNotification(feedback: FeedbackSubmission): Promise<v
   const webhookUrl = "https://hooks.zapier.com/hooks/catch/22884362/2ncd0om/"; // Updated with the provided Zapier webhook URL
   
   try {
+    console.log("Sending feedback notification to webhook:", webhookUrl);
+    
     await fetch(webhookUrl, {
       method: "POST",
       headers: {

@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -63,6 +62,7 @@ const FeedbackForm = ({ postId }: FeedbackFormProps) => {
   const onSubmit = async (data: FeedbackFormValues) => {
     try {
       setIsSubmitting(true);
+      console.log("Submitting feedback form with data:", data);
       
       // Submit feedback to Supabase
       await submitFeedback({
@@ -81,7 +81,7 @@ const FeedbackForm = ({ postId }: FeedbackFormProps) => {
       // Reset the form
       form.reset();
     } catch (error: any) {
-      console.error("Error submitting feedback:", error);
+      console.error("Error submitting feedback from form:", error);
       toast({
         title: "Submission failed",
         description: error.message || "There was a problem submitting your feedback. Please try again.",
