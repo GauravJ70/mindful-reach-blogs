@@ -13,55 +13,23 @@ export async function submitFeedback(feedback: FeedbackSubmission): Promise<void
   console.log("Submitting feedback:", feedback);
   
   try {
-    // Try to determine if the post_id is a UUID or a slug
-    const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(feedback.post_id);
-    
-    let postId = feedback.post_id;
-    
-    if (!isUUID) {
-      console.log("Post ID appears to be a slug, attempting to find the associated post");
+    // Check if posts table has any content
+    const { data: allPosts, error: checkError } = await supabase
+      .from("posts")
+      .select("id, title")
+      .limit(5);
       
-      // Try multiple ways to find the post:
-      // 1. First try to match by slug (assuming slug is stored in the title with hyphens)
-      let { data: postBySlug, error: slugError } = await supabase
-        .from("posts")
-        .select("id")
-        .eq("title", feedback.post_id.replace(/-/g, " "))
-        .single();
-      
-      // 2. If that fails, try a more flexible search using ILIKE
-      if (slugError || !postBySlug) {
-        console.log("No exact match by title, trying fuzzy search");
-        const { data: postByFuzzy, error: fuzzyError } = await supabase
-          .from("posts")
-          .select("id")
-          .ilike("title", `%${feedback.post_id.replace(/-/g, " ")}%`)
-          .single();
-          
-        if (fuzzyError || !postByFuzzy) {
-          console.error("Error finding post for feedback:", fuzzyError || "No post found via fuzzy search");
-          
-          // 3. Get all posts to debug what's available
-          const { data: allPosts, error: listError } = await supabase
-            .from("posts")
-            .select("id, title");
-            
-          if (!listError && allPosts) {
-            console.log("Available posts:", allPosts);
-          }
-          
-          throw new Error("Could not find the associated post. Please try again later.");
-        }
-        
-        postId = postByFuzzy.id;
-        console.log("Found post via fuzzy search:", postId);
-      } else {
-        postId = postBySlug.id;
-        console.log("Found post via exact title match:", postId);
-      }
+    if (checkError) {
+      console.error("Error checking posts table:", checkError);
+    } else {
+      console.log("Current posts in database:", allPosts);
     }
-
-    // Now submit with the proper UUID
+    
+    // If no posts in database or can't find a match, use the original post_id
+    // This allows feedback to be collected even if posts aren't in the database yet
+    const postId = feedback.post_id;
+    
+    // Insert feedback with the post_id as provided
     const { error } = await supabase
       .from("feedback")
       .insert([{
