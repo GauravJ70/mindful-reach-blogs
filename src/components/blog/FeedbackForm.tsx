@@ -62,7 +62,7 @@ const FeedbackForm = ({ postId }: FeedbackFormProps) => {
   const onSubmit = async (data: FeedbackFormValues) => {
     try {
       setIsSubmitting(true);
-      console.log("Submitting feedback form with data:", data);
+      console.log("Submitting feedback form with data:", data, "for post ID:", postId);
       
       // Submit feedback to Supabase
       await submitFeedback({

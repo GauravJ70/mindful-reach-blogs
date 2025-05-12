@@ -13,37 +13,61 @@ export async function submitFeedback(feedback: FeedbackSubmission): Promise<void
   console.log("Submitting feedback:", feedback);
   
   try {
-    // First, get the proper UUID for the post based on its slug
-    const { data: post, error: postError } = await supabase
-      .from("posts")
-      .select("id")
-      .eq("id", feedback.post_id)
-      .single();
+    // Try to determine if the post_id is a UUID or a slug
+    const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(feedback.post_id);
     
-    if (postError) {
-      // Try to find the post by treating the post_id as a slug
-      const { data: sluggedPost, error: slugError } = await supabase
+    let postId = feedback.post_id;
+    
+    if (!isUUID) {
+      console.log("Post ID appears to be a slug, attempting to find the associated post");
+      
+      // Try multiple ways to find the post:
+      // 1. First try to match by slug (assuming slug is stored in the title with hyphens)
+      let { data: postBySlug, error: slugError } = await supabase
         .from("posts")
         .select("id")
-        .ilike("title", feedback.post_id.replace(/-/g, " "))
+        .eq("title", feedback.post_id.replace(/-/g, " "))
         .single();
-        
-      if (slugError || !sluggedPost) {
-        console.error("Error finding post for feedback:", slugError || "No post found");
-        throw new Error("Could not find the associated post. Please try again later.");
-      }
       
-      // Use the UUID from the found post
-      feedback = { ...feedback, post_id: sluggedPost.id };
-    } else if (post) {
-      // Use the UUID as is
-      feedback = { ...feedback, post_id: post.id };
+      // 2. If that fails, try a more flexible search using ILIKE
+      if (slugError || !postBySlug) {
+        console.log("No exact match by title, trying fuzzy search");
+        const { data: postByFuzzy, error: fuzzyError } = await supabase
+          .from("posts")
+          .select("id")
+          .ilike("title", `%${feedback.post_id.replace(/-/g, " ")}%`)
+          .single();
+          
+        if (fuzzyError || !postByFuzzy) {
+          console.error("Error finding post for feedback:", fuzzyError || "No post found via fuzzy search");
+          
+          // 3. Get all posts to debug what's available
+          const { data: allPosts, error: listError } = await supabase
+            .from("posts")
+            .select("id, title");
+            
+          if (!listError && allPosts) {
+            console.log("Available posts:", allPosts);
+          }
+          
+          throw new Error("Could not find the associated post. Please try again later.");
+        }
+        
+        postId = postByFuzzy.id;
+        console.log("Found post via fuzzy search:", postId);
+      } else {
+        postId = postBySlug.id;
+        console.log("Found post via exact title match:", postId);
+      }
     }
 
     // Now submit with the proper UUID
     const { error } = await supabase
       .from("feedback")
-      .insert([feedback]);
+      .insert([{
+        ...feedback,
+        post_id: postId
+      }]);
     
     if (error) {
       console.error("Error submitting feedback to database:", error);
@@ -54,7 +78,10 @@ export async function submitFeedback(feedback: FeedbackSubmission): Promise<void
 
     // Send notification via webhook
     try {
-      await sendFeedbackNotification(feedback);
+      await sendFeedbackNotification({
+        ...feedback,
+        post_id: postId
+      });
     } catch (notificationError) {
       console.error("Error sending feedback notification:", notificationError);
       // We don't throw here to avoid affecting the user experience
@@ -67,7 +94,7 @@ export async function submitFeedback(feedback: FeedbackSubmission): Promise<void
 }
 
 async function sendFeedbackNotification(feedback: FeedbackSubmission): Promise<void> {
-  const webhookUrl = "https://hooks.zapier.com/hooks/catch/22884362/2ncd0om/"; // Updated with the provided Zapier webhook URL
+  const webhookUrl = "https://hooks.zapier.com/hooks/catch/22884362/2ncd0om/";
   
   try {
     console.log("Sending feedback notification to webhook:", webhookUrl);
