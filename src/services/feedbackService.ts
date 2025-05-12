@@ -13,6 +13,34 @@ export async function submitFeedback(feedback: FeedbackSubmission): Promise<void
   console.log("Submitting feedback:", feedback);
   
   try {
+    // First, get the proper UUID for the post based on its slug
+    const { data: post, error: postError } = await supabase
+      .from("posts")
+      .select("id")
+      .eq("id", feedback.post_id)
+      .single();
+    
+    if (postError) {
+      // Try to find the post by treating the post_id as a slug
+      const { data: sluggedPost, error: slugError } = await supabase
+        .from("posts")
+        .select("id")
+        .ilike("title", feedback.post_id.replace(/-/g, " "))
+        .single();
+        
+      if (slugError || !sluggedPost) {
+        console.error("Error finding post for feedback:", slugError || "No post found");
+        throw new Error("Could not find the associated post. Please try again later.");
+      }
+      
+      // Use the UUID from the found post
+      feedback = { ...feedback, post_id: sluggedPost.id };
+    } else if (post) {
+      // Use the UUID as is
+      feedback = { ...feedback, post_id: post.id };
+    }
+
+    // Now submit with the proper UUID
     const { error } = await supabase
       .from("feedback")
       .insert([feedback]);

@@ -165,7 +165,7 @@ const BlogPostPage = () => {
       
       <Separator className="my-8" />
 
-      <FeedbackForm postId={post.id} />
+      {post && <FeedbackForm postId={post.id} />}
     </article>
   );
 };
